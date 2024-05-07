@@ -33,7 +33,10 @@ class Brane(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         
-        self.amplitude = np.random.random((SIM_SIZE, SIM_SIZE))
+        # self.amplitude = np.random.random((SIM_SIZE, SIM_SIZE))
+        wf_r = np.sqrt(np.random.uniform(0, 1, (SIM_SIZE, SIM_SIZE)))
+        wf_phase = np.exp(1.j * np.random.uniform(0, 2 * np.pi, (SIM_SIZE, SIM_SIZE)))
+        self.wf = wf_r * wf_phase
         self.surf = pygame.Surface((2, 2)) # temporary
         self.surf.fill((128,128,128))
         self.rect = pygame.Rect(0,0,WIDTH,WIDTH)
@@ -45,8 +48,12 @@ class Brane(pygame.sprite.Sprite):
         
         
     def update(self, dt):
+        # update the wavefunction forward in time
+        self.wf *= np.exp(-1.j*dt)
+        
         # re-paint the surface
-        amp_arr = np.floor(255*self.amplitude/np.max(self.amplitude)).astype(np.uint8)
+        amp_arr = np.absolute(self.wf)
+        amp_arr = np.floor(255*amp_arr/np.max(amp_arr)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
         amp_surf = pygame.surfarray.make_surface(amp_arr)
         self.surf = pygame.transform.smoothscale(amp_surf, (WIDTH,WIDTH))
