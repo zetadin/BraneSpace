@@ -68,7 +68,7 @@ class Wavelet:
         
     def f(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
-        Wavelet intencity everywhere in space.
+        Wavelet intencity at points x.
         """
         rprime = x - self.R[np.newaxis,np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
@@ -78,7 +78,7 @@ class Wavelet:
                 distMat <= self.v*self.lifetime,
                 distMat >= max(0, self.v*self.lifetime - self.L)
                 )
-        I = np.zeros((SIM_SIZE, SIM_SIZE))
+        I = np.zeros((x.shape[0], x.shape[1]))
         I[mask] = self.A*np.sin(self.k*distMat[mask] - self.w*self.lifetime)
         I[mask] /= self.v*self.lifetime # Conserve intensity with time
         return(I)
@@ -86,7 +86,7 @@ class Wavelet:
         
     def gradf(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
-        Gradient of wavelet intencity everywhere in space.
+        Gradient of wavelet intencity at point x.
         """
         rprime = x - self.R[np.newaxis,np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
@@ -95,12 +95,13 @@ class Wavelet:
                 distMat <= self.v*self.lifetime,
                 distMat >= max(0, self.v*self.lifetime - self.L)
                 )
-        mask = mask[:,:,np.newaxis] # expand to cover the x and y
 
-        G = np.zeros((SIM_SIZE, SIM_SIZE, 2))        
+#        mask = mask[:,:,np.newaxis] # expand to cover the x and y
+
+        G = np.zeros(x.shape)
         G[mask] = self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime)
-        G[mask]*= rprime[mask] * self.k/(2*distMat[mask])
-        G[mask] /= self.v*self.lifetime # Conserve intensity with time
+        G[mask]*= rprime[:,:,np.newaxis] * self.k/(2*distMat[mask])
+        G[mask]/= self.v*self.lifetime # Conserve intensity with time
         
         return(G)
 
@@ -135,13 +136,11 @@ class Brane(pygame.sprite.Sprite):
         
         
     def update(self, dt: float):
-        
         # update the intensity
         self.I = np.zeros((SIM_SIZE, SIM_SIZE))
         for wl in self.wavelets:
             wl.update(dt)
             self.I += wl.f(self.coords)
-        
         
         # add a new wavelet every so often
         self.elapsed += dt
@@ -158,12 +157,54 @@ class Brane(pygame.sprite.Sprite):
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
         amp_surf = pygame.surfarray.make_surface(amp_arr)
         self.surf = pygame.transform.smoothscale(amp_surf, (WIDTH,WIDTH))
+        
+    def computeForceAt(self, x: npt.ArrayLike) -> npt.ArrayLike:
+        # update the intensity
+        F = np.zeros(x.shape)
+        for wl in self.wavelets:
+            F -= wl.gradf(x)
+            
+        return(F)
 
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.surf = pygame.Surface((10,10)) # temporary
+        pygame.draw.circle(
+                surface=self.surf, color=(255, 0, 0),
+                center=(5,5), radius=5)
+        
+        self.mass = 10.
+        self.r = np.array([WIDTH/2, HEIGHT/2])
+        self.v = np.zeros(2)
+        
+        self.rect = self.surf.get_rect(center=self.r)
+        
+        self.parentBrane = None
+        
+    def update(self, dt: float):
+        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
+        self.v += dt*F/self.mass
+        self.v *= np.exp(0.999*dt) # drag
+        self.r += self.v*dt
+        
+        self.rect = self.surf.get_rect(center=self.r)
+
+    def register(self, brane: Brane):
+        # put into game object lists
+        all_sprites.add(self)
+        updatable_sprites.add(self)
+        
+        self.parentBrane = brane
+        
         
 # init objects        
 cur_brane = Brane()
 cur_brane.register()
+
+ball = Ball()
+ball.register(cur_brane)
 
 
 # initial guess at frame time
