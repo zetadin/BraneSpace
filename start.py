@@ -72,7 +72,6 @@ class Wavelet:
         """
         rprime = x - self.R[np.newaxis,np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
-        # rprimeHat = rprime/distMat
         
         mask = np.logical_and(
                 distMat <= self.v*self.lifetime,
@@ -88,20 +87,23 @@ class Wavelet:
         """
         Gradient of wavelet intencity at point x.
         """
-        rprime = x - self.R[np.newaxis,np.newaxis,:]
+        rprime = x - self.R[np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
-        
+#        print(rprime, distMat)
         mask = np.logical_and(
                 distMat <= self.v*self.lifetime,
                 distMat >= max(0, self.v*self.lifetime - self.L)
                 )
 
-#        mask = mask[:,:,np.newaxis] # expand to cover the x and y
+#        print("gradf distMat:", distMat,
+#              [self.v*self.lifetime, max(0, self.v*self.lifetime - self.L)], mask)
 
         G = np.zeros(x.shape)
-        G[mask] = self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime)
-        G[mask]*= rprime[:,:,np.newaxis] * self.k/(2*distMat[mask])
-        G[mask]/= self.v*self.lifetime # Conserve intensity with time
+        if(np.any(mask)):  # only do this if there is an active point
+            G[mask] = self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime)
+            G[mask]*= rprime[mask,:] * self.k/(2*distMat[mask])
+            G[mask]/= self.v*self.lifetime # Conserve intensity with time
+            print(G)
         
         return(G)
 
@@ -114,7 +116,10 @@ class Brane(pygame.sprite.Sprite):
         self.I[16, 16] = 1.
         self.surf = pygame.Surface((2, 2)) # temporary
         self.surf.fill((128,128,128))
-        self.rect = pygame.Rect(0,0,WIDTH,WIDTH)
+        
+        self.surfSize = max(WIDTH, HEIGHT)
+        self.surfScale = float(self.surfSize)/SIM_SIZE
+        self.rect = pygame.Rect(0,0,self.surfSize,self.surfSize)
         
         pos = np.arange(SIM_SIZE)
         self.coords = np.zeros((SIM_SIZE, SIM_SIZE, 2))
@@ -144,7 +149,7 @@ class Brane(pygame.sprite.Sprite):
         
         # add a new wavelet every so often
         self.elapsed += dt
-        if(self.elapsed > 1000):
+        if(self.elapsed > 2000):
             self.elapsed = 0.
             R = np.random.random((2))*SIM_SIZE
             wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
@@ -159,11 +164,16 @@ class Brane(pygame.sprite.Sprite):
         self.surf = pygame.transform.smoothscale(amp_surf, (WIDTH,WIDTH))
         
     def computeForceAt(self, x: npt.ArrayLike) -> npt.ArrayLike:
-        # update the intensity
+        # transform x into the simulation coordinates
+        x = x/self.surfScale
+        
+        # ask all wavelets for their force contributions
         F = np.zeros(x.shape)
         for wl in self.wavelets:
             F -= wl.gradf(x)
             
+        # move force back into screen coordinate space
+        F *= self.surfScale
         return(F)
 
 
@@ -175,9 +185,11 @@ class Ball(pygame.sprite.Sprite):
                 surface=self.surf, color=(255, 0, 0),
                 center=(5,5), radius=5)
         
-        self.mass = 10.
-        self.r = np.array([WIDTH/2, HEIGHT/2])
+        self.mass = 1.0e2
+        # coordinates in world space
+        self.r = np.array([WIDTH/2, WIDTH/2])
         self.v = np.zeros(2)
+        self.a = np.zeros(2)
         
         self.rect = self.surf.get_rect(center=self.r)
         
@@ -185,11 +197,23 @@ class Ball(pygame.sprite.Sprite):
         
     def update(self, dt: float):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
-        self.v += dt*F/self.mass
-        self.v *= np.exp(0.999*dt) # drag
-        self.r += self.v*dt
+        # remove the extra dimention used for multiple points
+        F = np.squeeze(F, axis=0)
+        
+        # acelleration
+        aNext = F/self.mass
+        # drag
+        aNext -= 0.1*np.abs(self.v)*self.v
+        # velocity verlet
+        self.r += self.v*dt + 0.5*self.a
+        self.v += 0.5*dt*(self.a+aNext)
+        self.a = aNext
+        
+        
+        print(self.r, self.v, self.a, F)
         
         self.rect = self.surf.get_rect(center=self.r)
+#        pass
 
     def register(self, brane: Brane):
         # put into game object lists
@@ -209,6 +233,14 @@ ball.register(cur_brane)
 
 # initial guess at frame time
 dt = 1000./FPS
+
+
+#
+## fast forward
+#for entity in updatable_sprites:
+#    entity.update(2500)
+    
+
 
 
 # game loop
