@@ -39,6 +39,7 @@ class Entity():
         # acelleration
         aNext = F/self.mass
         # drag
+
         aNext -= self.dragCoef * np.abs(self.v)*self.v
         # velocity verlet
         self.r += self.v*dt + 0.5*self.a
@@ -56,18 +57,18 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
     """
     An entity that gets drawn on sceen.
     """
-    def __init__(self, mass=1.0, drag=0.0):
+    def __init__(self, mass=50.0, drag=0.0):
         # superclass constructors
         super().__init__(mass, drag)
         
         # create a temp image that will be overriden
-        self.img = pygame.Surface((10,10), flags=SRCALPHA)
+        self.img = pygame.Surface((16,16), flags=SRCALPHA)
         pygame.draw.rect(
                 surface=self.img, color=(255, 0, 0, 255),
                 rect=self.img.get_rect(),
                 width=2, border_radius = 3)
         
-        self.size = 10
+        self.size = 16
         
         self.theta = 0.0 # direction in radians from North (Up)
         
@@ -81,7 +82,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
         
         # update position on screen
-        rect = self.surf.get_rect(center=self.r)
+        rect = surf.get_rect(center=self.r)
         
         # draw to screen
         screen.blit(surf, rect)

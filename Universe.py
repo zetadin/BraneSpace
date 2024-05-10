@@ -14,3 +14,9 @@ SIM_SIZE = 128
 # game object lists for this universe
 drawables = pygame.sprite.Group()
 updatables = []
+
+
+#def reset():
+#    global drawables, updatables
+#    drawables = pygame.sprite.Group()
+#    updatables = []

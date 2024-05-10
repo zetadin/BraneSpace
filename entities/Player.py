@@ -27,7 +27,7 @@ class Player(SpriteEntity):
         
         
     def update(self, dt: float):
-        super.update(dt)
+        super().update(dt)
         
         # spin ship for demo of rotation
         self.theta -= 0.01*dt*np.pi
