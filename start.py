@@ -7,8 +7,9 @@ import numpy.typing as npt
 
 
 from Brane import Brane
-from Universe import updatable_sprites, all_sprites
+from Universe import updatables, drawables
 from View import View, HEIGHT, WIDTH, FPS
+from entities.Entity import SpriteEntity
 
 
 view = View()
@@ -59,12 +60,12 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=self.r)
         
         # draw to screen
-        screen.blit(entity.surf, entity.rect)
+        screen.blit(self.surf, self.rect)
 
     def register(self, brane: Brane):
         # put into game object lists
-        all_sprites.add(self)
-        updatable_sprites.add(self)
+        drawables.add(self)
+        updatables.append(self)
         
         self.parentBrane = brane
         
@@ -129,8 +130,8 @@ class Portal(pygame.sprite.Sprite):
 
     def register(self, brane: Brane):
         # put into game object lists
-        all_sprites.add(self)
-        updatable_sprites.add(self)
+        drawables.add(self)
+        updatables.append(self)
         
         self.parentBrane = brane
         
@@ -187,8 +188,8 @@ class Player(pygame.sprite.Sprite):
 
     def register(self, brane: Brane):
         # put into game object lists
-        all_sprites.add(self)
-        updatable_sprites.add(self)
+        drawables.add(self)
+        updatables.append(self)
         
         self.parentBrane = brane
         
@@ -210,6 +211,10 @@ player.register(cur_brane)
 
 portal = Portal()
 portal.register(cur_brane)
+
+filler = SpriteEntity()
+filler.r = np.array([5,5])
+filler.register(cur_brane)
 
 
 # initial guess at frame time

@@ -12,7 +12,7 @@ import pygame
 from pygame.locals import *
 
 from wavelets.Wavelet import Wavelet
-from Universe import SIM_SIZE, updatable_sprites, all_sprites
+from Universe import SIM_SIZE, updatables, drawables
 from View import HEIGHT, WIDTH
 
 
@@ -47,8 +47,8 @@ class Brane(pygame.sprite.Sprite):
         
     def register(self):
         # put into game object lists
-        all_sprites.add(self)
-        updatable_sprites.add(self)
+        drawables.add(self)
+        updatables.append(self)
         
         
     def update(self, dt: float):
