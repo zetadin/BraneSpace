@@ -6,7 +6,7 @@ Some game assets were obtained from https://game-icons.net/ under the CC BY 3.0 
 No transformations were done outside game-icons.net website, therefore these assets can be redistributed under CC BY 3.0 license.
 
 BraneSpace uses python 3 (https://docs.python.org/3/license.html), numpy (https://numpy.org/doc/stable/license.html), and pygame (LGPL 2.1, https://github.com/pygame/pygame/blob/main/docs/LGPL.txt) which have their own licences.
-
+Details of these licences can be found in docs/licenses folder.
 
 #####################################################
 Attribution-NonCommercial-ShareAlike 4.0 International

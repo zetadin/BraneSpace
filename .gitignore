@@ -2,7 +2,7 @@
 BraneSpace_venv
 
 # WSL zone identifiers
-*.Zone*
+*Zone.Identifier
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
