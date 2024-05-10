@@ -89,21 +89,16 @@ class Wavelet:
         """
         rprime = x - self.R[np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
-#        print(rprime, distMat)
         mask = np.logical_and(
                 distMat <= self.v*self.lifetime,
                 distMat >= max(0, self.v*self.lifetime - self.L)
                 )
-
-#        print("gradf distMat:", distMat,
-#              [self.v*self.lifetime, max(0, self.v*self.lifetime - self.L)], mask)
 
         G = np.zeros(x.shape)
         if(np.any(mask)):  # only do this if there is an active point
             G[mask] = self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime)
             G[mask]*= rprime[mask,:] * self.k/(2*distMat[mask])
             G[mask]/= self.v*self.lifetime # Conserve intensity with time
-            print(G)
         
         return(G)
 
@@ -155,13 +150,21 @@ class Brane(pygame.sprite.Sprite):
             wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
             wl.register(self)
             
-            print(f"ms from last wavelet: {self.elapsed}\t live wavelets: {len(self.wavelets)}")
+            # print(f"ms from last wavelet: {self.elapsed}\t live wavelets: {len(self.wavelets)}")
         
-        # re-paint the surface
+    def draw(self, screen):
+        """
+        Draw to screen
+        """
+        # re-paint the surface from simulation
         amp_arr = np.floor(np.clip(256*(self.I+1)/2, 0,255)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
         amp_surf = pygame.surfarray.make_surface(amp_arr)
         self.surf = pygame.transform.smoothscale(amp_surf, (WIDTH,WIDTH))
+        
+        # draw to screen
+        screen.blit(entity.surf, entity.rect)
+        
         
     def computeForceAt(self, x: npt.ArrayLike) -> npt.ArrayLike:
         # transform x into the simulation coordinates
@@ -180,12 +183,14 @@ class Brane(pygame.sprite.Sprite):
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.surf = pygame.Surface((10,10)) # temporary
+        # create transparent surface
+        self.surf = pygame.Surface((10,10), flags=SRCALPHA) 
         pygame.draw.circle(
-                surface=self.surf, color=(255, 0, 0),
+                surface=self.surf, color=(255, 0, 0, 255),
                 center=(5,5), radius=5)
         
         self.mass = 1.0e2
+        self.dragCoef = 0.1
         # coordinates in world space
         self.r = np.array([WIDTH/2, WIDTH/2])
         self.v = np.zeros(2)
@@ -203,17 +208,80 @@ class Ball(pygame.sprite.Sprite):
         # acelleration
         aNext = F/self.mass
         # drag
-        aNext -= 0.1*np.abs(self.v)*self.v
+        aNext -= self.dragCoef *np.abs(self.v)*self.v
         # velocity verlet
         self.r += self.v*dt + 0.5*self.a
         self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
         
         
-        print(self.r, self.v, self.a, F)
-        
+    def draw(self, screen):
+        """
+        Draw to screen
+        """       
+        # update position on screen
         self.rect = self.surf.get_rect(center=self.r)
-#        pass
+        
+        # draw to screen
+        screen.blit(entity.surf, entity.rect)
+
+    def register(self, brane: Brane):
+        # put into game object lists
+        all_sprites.add(self)
+        updatable_sprites.add(self)
+        
+        self.parentBrane = brane
+        
+        
+        
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.img = pygame.image.load("assets/entities/player/rocket.png").convert_alpha()
+        self.size = 64 # px
+        
+        self.mass = 5.0e3
+        self.dragCoef = 0.2
+        # coordinates in world space
+        self.r = np.array([WIDTH/3, WIDTH/3])
+        self.v = np.zeros(2)
+        self.a = np.zeros(2)
+        
+        self.theta = 0.0 # direction in radians from North (Up)
+        
+        self.parentBrane = None
+        
+    def update(self, dt: float):
+        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
+        # remove the extra dimention used for multiple points
+        F = np.squeeze(F, axis=0)
+        
+        # acelleration
+        aNext = F/self.mass
+        # drag
+        aNext -= self.dragCoef *np.abs(self.v)*self.v
+        # velocity verlet
+        self.r += self.v*dt + 0.5*self.a
+        self.v += 0.5*dt*(self.a+aNext)
+        self.a = aNext
+        
+        # spin ship for demo of rotation
+        self.theta += 0.01*dt*np.pi
+
+    def draw(self, screen):
+        """
+        Draw to screen
+        """       
+        # re-paint the surface from simulation
+        zoom = float(self.size)/self.img.get_width()
+        self.surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
+#        self.surf = pygame.transform.smoothscale(self.img, (self.size,self.size))
+        
+        # update position on screen
+        self.rect = self.surf.get_rect(center=self.r)
+        
+        # draw to screen
+        screen.blit(entity.surf, entity.rect)
 
     def register(self, brane: Brane):
         # put into game object lists
@@ -229,6 +297,9 @@ cur_brane.register()
 
 ball = Ball()
 ball.register(cur_brane)
+
+player = Player()
+player.register(cur_brane)
 
 
 # initial guess at frame time
@@ -259,7 +330,7 @@ while True:
  
     # draw everything
     for entity in all_sprites:
-        displaysurface.blit(entity.surf, entity.rect)
+        entity.draw(displaysurface)
  
     # show FPS
     fps_surface = serif_font.render(
