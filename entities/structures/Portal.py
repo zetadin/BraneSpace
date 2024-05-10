@@ -18,6 +18,7 @@ class Portal(SpriteEntity):
         self.img = pygame.image.load("assets/entities/structures/portal.png").convert_alpha()
         self.size = 128 # px
         
+        # physics properties
         self.mass = 1.0e9
         self.dragCoef = 20
 

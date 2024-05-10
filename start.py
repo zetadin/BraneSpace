@@ -12,75 +12,13 @@ from View import View, HEIGHT, WIDTH, FPS
 from entities.Entity import SpriteEntity
 from entities.SimpleObjects import Ball
 from entities.structures.Portal import Portal
+from entities.Player import Player
 
 
 view = View()
-       
-        
-        
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.img = pygame.image.load("assets/entities/player/rocket.png").convert_alpha()
-        self.size = 64 # px
-        
-        self.mass = 5.0e3
-        self.dragCoef = 0.2
-        # coordinates in world space
-        self.r = np.array([WIDTH/3, WIDTH/3])
-        self.v = np.zeros(2)
-        self.a = np.zeros(2)
-        
-        self.theta = 0.0 # direction in radians from North (Up)
-        
-        self.parentBrane = None
-        
-    def update(self, dt: float):
-        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
-        # remove the extra dimention used for multiple points
-        F = np.squeeze(F, axis=0)
-        
-        # acelleration
-        aNext = F/self.mass
-        # drag
-        aNext -= self.dragCoef * np.abs(self.v)*self.v
-        # velocity verlet
-        self.r += self.v*dt + 0.5*self.a
-        self.v += 0.5*dt*(self.a+aNext)
-        self.a = aNext
-        
-        # spin ship for demo of rotation
-        self.theta -= 0.01*dt*np.pi
 
-    def draw(self, screen):
-        """
-        Draw to screen
-        """       
-        # re-paint the surface from simulation
-        zoom = float(self.size)/self.img.get_width()
-        self.surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
-#        self.surf = pygame.transform.smoothscale(self.img, (self.size,self.size))
         
-        # update position on screen
-        self.rect = self.surf.get_rect(center=self.r)
-        
-        # draw to screen
-        screen.blit(entity.surf, entity.rect)
-
-    def register(self, brane: Brane):
-        # put into game object lists
-        drawables.add(self)
-        updatables.append(self)
-        
-        self.parentBrane = brane
-        
-        
-        
-        
-        
-        
-        
-# init objects        
+# init objects in universe
 cur_brane = Brane()
 cur_brane.register()
 
