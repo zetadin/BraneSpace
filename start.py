@@ -208,7 +208,7 @@ class Ball(pygame.sprite.Sprite):
         # acelleration
         aNext = F/self.mass
         # drag
-        aNext -= self.dragCoef *np.abs(self.v)*self.v
+        aNext -= self.dragCoef * np.abs(self.v)*self.v
         # velocity verlet
         self.r += self.v*dt + 0.5*self.a
         self.v += 0.5*dt*(self.a+aNext)
@@ -224,6 +224,72 @@ class Ball(pygame.sprite.Sprite):
         
         # draw to screen
         screen.blit(entity.surf, entity.rect)
+
+    def register(self, brane: Brane):
+        # put into game object lists
+        all_sprites.add(self)
+        updatable_sprites.add(self)
+        
+        self.parentBrane = brane
+        
+        
+        
+        
+class Portal(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.img = pygame.image.load("assets/entities/structures/portal.png").convert_alpha()
+        self.size = 128 # px
+        
+        self.mass = 1.0e9
+        self.dragCoef = 20
+        # coordinates in world space
+        self.r = np.array([WIDTH*0.7, WIDTH*0.7])
+        self.v = np.zeros(2)
+        self.a = np.zeros(2)
+        
+        self.theta = 0.0 # direction in radians from North (Up)
+        
+        self.parentBrane = None
+        
+    def update(self, dt: float):
+        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
+        # remove the extra dimention used for multiple points
+        F = np.squeeze(F, axis=0)
+        
+        # acelleration
+        aNext = F/self.mass
+        # drag
+        aNext -= self.dragCoef * np.abs(self.v)*self.v
+        # velocity verlet
+        self.r += self.v*dt + 0.5*self.a
+        self.v += 0.5*dt*(self.a+aNext)
+        self.a = aNext
+        
+        # spin ship for demo of rotation
+        self.theta += 0.025*dt*np.pi
+        
+    def updateBrane(self, dt: float):
+        """
+        Update brane's intensity with local effects
+        """
+        pass
+        
+        
+    def draw(self, screen):
+        """
+        Draw to screen
+        """       
+        # re-paint the surface from simulation
+        zoom = float(self.size)/self.img.get_width()
+        self.surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
+        
+        # update position on screen
+        self.rect = self.surf.get_rect(center=self.r)
+        
+        # draw to screen
+        screen.blit(entity.surf, entity.rect)
+        
 
     def register(self, brane: Brane):
         # put into game object lists
@@ -259,14 +325,14 @@ class Player(pygame.sprite.Sprite):
         # acelleration
         aNext = F/self.mass
         # drag
-        aNext -= self.dragCoef *np.abs(self.v)*self.v
+        aNext -= self.dragCoef * np.abs(self.v)*self.v
         # velocity verlet
         self.r += self.v*dt + 0.5*self.a
         self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
         
         # spin ship for demo of rotation
-        self.theta += 0.01*dt*np.pi
+        self.theta -= 0.01*dt*np.pi
 
     def draw(self, screen):
         """
@@ -291,6 +357,11 @@ class Player(pygame.sprite.Sprite):
         self.parentBrane = brane
         
         
+        
+        
+        
+        
+        
 # init objects        
 cur_brane = Brane()
 cur_brane.register()
@@ -300,6 +371,9 @@ ball.register(cur_brane)
 
 player = Player()
 player.register(cur_brane)
+
+portal = Portal()
+portal.register(cur_brane)
 
 
 # initial guess at frame time
