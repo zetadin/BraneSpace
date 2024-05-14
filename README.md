@@ -1,7 +1,7 @@
 # BraneSpace
 
 An extra-dimensional 2D space game written with pygame.
-Single player, PVE, looter-shooter, builder.
+Single player, PVE, looter-shooter with tower defence elements.
 
 
 To shorten interstellar trade routes, InterDimTrade Inc. egineers have found a way to travel through other parts of the multiverse, called branes.
