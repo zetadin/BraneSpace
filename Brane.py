@@ -62,9 +62,9 @@ class Brane(pygame.sprite.Sprite):
         self.elapsed += dt
         if(self.elapsed > 2000):
             self.elapsed = 0.
-#            R = np.random.random((2))*SIM_SIZE
-#            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
-#            wl.register(self)
+            R = np.random.random((2))*SIM_SIZE
+            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
+            wl.register(self)
 
 
     def draw(self, view):
@@ -100,7 +100,7 @@ class Brane(pygame.sprite.Sprite):
         # overwtite grad_surf's alpha
         gsa = np.array(grad_surf.get_view('A'), copy=False)
         gsa[:,:] = grad_alpha
-        del gsa # to unlcok surface
+        del gsa # to unlock grad_surf to allow blit 
         
         # draw onto intensity's surface
         amp_surf.blit(grad_surf, grad_surf.get_rect())

@@ -135,7 +135,7 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
 #            print("rprime", rprime.shape)
 #            print("rprimeLen", rprimeLen.shape)
 #            print("rprimeLen[mask]", rprimeLen[mask].shape)
-#            print(mask)
+
             
             # distance dependence from source
             Id = self.A*(np.sqrt(self.Rmax) - np.sqrt(rprimeLen[mask]))
@@ -149,18 +149,18 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             
             
             # gradients of components
-            gradrprime = - rprime[mask]/np.sqrt(rprimeLen[mask])
+            gradrprime = - rprime[mask]/np.sqrt(rprimeLen[mask])[:,np.newaxis]
             
             gradId = self.A*(np.sqrt(self.Rmax) + 0.5/np.sqrt(rprimeLen[mask]))
             gradId = gradId[:,np.newaxis] * gradrprime
 #            print("gradId", gradId.shape)
-            gradIa = (self.dir - cosTheta*gradrprime)/rprimeLen[mask]
+            gradIa = (self.dir[np.newaxis,:] - cosTheta[:,np.newaxis]*gradrprime)/rprimeLen[mask][:,np.newaxis]
 #            print("gradIa", gradIa.shape)
             
             relpos = rprimeLen[mask] - self.v*self.lifetime
             gradW = np.where(relpos>0, -2.0/self.L, 0.0) # 0 at peak of np.abs
             gradW = np.where(relpos<0, +2.0/self.L, gradW)
-            gradW = gradW * gradrprime
+            gradW = gradW[:,np.newaxis] * gradrprime
 #            print("gradW", gradW.shape)
             
     
@@ -168,6 +168,8 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             Ia = Ia[:,np.newaxis]
             Id = Id[:,np.newaxis]
             W = W[:,np.newaxis]
+#            print("Ia", Ia.shape)
+#            print("Id", Id.shape)
 #            print("W", W.shape)
 #            print("G", G.shape)
 #            print("mask", mask.shape)
