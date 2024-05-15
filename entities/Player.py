@@ -10,6 +10,7 @@ import numpy as np
 import pygame
 from pygame.locals import *
 from entities.Entity import SpriteEntity
+from wavelets.Tractor import Tractor
 from View import HEIGHT, WIDTH
 
 
@@ -25,10 +26,26 @@ class Player(SpriteEntity):
         # coordinates in world space
         self.r = np.array([WIDTH/3, WIDTH/3])
         
+        self.tractorElapsed = 0.0
+        
         
     def update(self, dt: float):
         super().update(dt)
         
         # spin ship for demo of rotation
         self.theta -= 0.01*dt*np.pi
+        
+        
+        # every L/(2*v) seconds emit a tractor wavelet
+        
+        self.tractorElapsed += dt
+        if(self.tractorElapsed > 1000):
+            self.tractorElapsed = 0.
+            
+            direction = np.array([np.sin(self.theta), np.cos(self.theta)])
+            wl = Tractor(
+                    source=self.r/self.parentBrane.surfScale, # sim coords
+                    direction=direction
+                        )
+            wl.register(self.parentBrane)
         
