@@ -67,10 +67,13 @@ class Brane(pygame.sprite.Sprite):
             wl.register(self)
 
 
-    def draw(self, screen):
+    def draw(self, view):
         """
         Draw to screen
         """
+        
+        screen = view.displaysurface
+        
         # re-paint the surface from simulation
         amp_arr = np.floor(np.clip(256*(self.I+1)/2, 0,255)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)

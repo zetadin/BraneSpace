@@ -55,7 +55,7 @@ while True:
  
     # draw everything
     for entity in drawables:
-        entity.draw(view.displaysurface)
+        entity.draw(view)
  
     # show FPS
     fps_surface = view.serif_font.render(

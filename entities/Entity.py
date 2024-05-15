@@ -73,19 +73,21 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         self.theta = 0.0 # direction in radians from North (Up)
         
                 
-    def draw(self, screen):
+    def draw(self, view):
         """
         Draw to screen
-        """       
-        # scale & rotate the image
-        zoom = float(self.size)/self.img.get_width()
-        surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
-        
-        # update position on screen
-        rect = surf.get_rect(center=self.r)
-        
-        # draw to screen
-        screen.blit(surf, rect)
+        """
+        # culling
+        if(view.isOnScreen(self)):
+            # scale & rotate the image
+            zoom = float(self.size)*view.zoom/self.img.get_width()
+            surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
+            
+            # update position on screen
+            rect = surf.get_rect(center=view.transform(self.r))
+            
+            # draw to screen
+            view.displaysurface.blit(surf, rect)
         
 
     def register(self, brane: Brane):
