@@ -78,6 +78,34 @@ class Brane(pygame.sprite.Sprite):
         amp_arr = np.floor(np.clip(256*(self.I+1)/2, 0,255)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
         amp_surf = pygame.surfarray.make_surface(amp_arr)
+        
+        # gradient
+        gcoords = self.coords.reshape((-1,2))
+        grad_arr = self.computeForceAt(gcoords)
+        grad_arr = grad_arr.reshape((SIM_SIZE,SIM_SIZE,2))
+#        grad_I = np.linalg.norm(grad_arr, axis=-1)
+        grad_colors = np.zeros((SIM_SIZE,SIM_SIZE,3)).astype(np.uint8)
+        # x -> red
+        grad_colors[:,:,0] = np.floor(np.clip(256*(grad_arr[:,:,0]+1)/2, 0,255)).astype(np.uint8)
+        # y -> green
+        grad_colors[:,:,1] = np.floor(np.clip(256*(grad_arr[:,:,1]+1)/2, 0,255)).astype(np.uint8)
+        # alpha
+        grad_alpha = np.max(grad_colors[:,:,0:1], axis=-1)
+    
+        # new surface for gradient
+        grad_surf = pygame.Surface((SIM_SIZE,SIM_SIZE), pygame.SRCALPHA, 32)
+        # Copy the rgb part of array to the new surface.
+        pygame.pixelcopy.array_to_surface(grad_surf, grad_colors)
+
+        # overwtite grad_surf's alpha
+        gsa = np.array(grad_surf.get_view('A'), copy=False)
+        gsa[:,:] = grad_alpha
+        del gsa # to unlcok surface
+        
+        # draw onto intensity's surface
+        amp_surf.blit(grad_surf, grad_surf.get_rect())
+
+        # transform into screen coords
         self.surf = pygame.transform.smoothscale(
                         amp_surf, (screen.get_width(), screen.get_height())
                         )
