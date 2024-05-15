@@ -62,9 +62,9 @@ class Brane(pygame.sprite.Sprite):
         self.elapsed += dt
         if(self.elapsed > 2000):
             self.elapsed = 0.
-            R = np.random.random((2))*SIM_SIZE
-            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
-            wl.register(self)
+#            R = np.random.random((2))*SIM_SIZE
+#            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
+#            wl.register(self)
 
 
     def draw(self, view):

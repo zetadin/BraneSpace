@@ -7,18 +7,23 @@ Created on Wed May 15 10:21:47 2024
 """
 
 from wavelets.Wavelet import Wavelet
+from Universe import drawables
 import numpy as np
 import numpy.typing as npt
+import pygame
+from pygame.locals import *
 
 
-class Tractor(Wavelet):
+class Tractor(Wavelet, pygame.sprite.Sprite):
     def __init__(self, source: npt.ArrayLike,
                  direction: npt.ArrayLike,
                  v: float = 3.2e-2,
                  L: float = 16,
-                 A: float = 1.0,
+                 A: float = 0.1,
                  Rmax: float = 128.0,
-                 theta0: float = np.pi/6.0):
+                 theta0: float = np.pi/6.0,
+                 debug=False):
+        
         self.v = v
         self.L = L
         self.A = A
@@ -28,13 +33,52 @@ class Tractor(Wavelet):
         self.R = source
         self.dir = direction/np.linalg.norm(direction)
         
-        self.k = 2*np.pi/self.L
-        self.w = self.v*self.k
-        
         # lifetime
         self.maxLifetime = (self.Rmax + self.L)/self.v
         self.lifetime = 0
+        
+        # registration
         self.parentBrane = None
+        
+        # debug
+        self.debug = debug
+        if(self.debug):
+            pygame.sprite.Sprite.__init__(self) # manually init the Sprite
+            
+            self.size = 4
+            self.img = pygame.Surface((self.size, self.size), flags=SRCALPHA) 
+            pygame.draw.circle(
+                    surface=self.img, color=(0, 0, 255, 255),
+                    center=(self.size/2, self.size/2), radius=2
+                    )
+        
+        
+    def register(self, brane: "Brane"):
+        """Add to the list of objects in the universe."""
+        super().register(brane)
+        
+        if self.debug:
+            drawables.add(self)
+            
+        
+    def update(self, dt: float):
+        super().update(dt)
+        
+        # remove wavelet from drawables after its lifetime is over
+        if self.debug:
+            if(self.lifetime > self.maxLifetime):
+                drawables.remove(self)
+                
+    def draw(self, view):
+        """
+        Draw to screen
+        """
+        # update position on screen
+        rect = self.img.get_rect(center=view.transform(self.R*self.parentBrane.surfScale))
+        
+        # draw to screen
+        view.displaysurface.blit(self.img, rect)
+        
         
     def f(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
@@ -77,7 +121,7 @@ class Tractor(Wavelet):
         """
         Gradient of wavelet intencity at point x.
         """
-        rprime = x - self.R[np.newaxis,np.newaxis,:]
+        rprime = x - self.R[np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
                 
         # Wavelet window, triangular: ___/\___
@@ -87,7 +131,11 @@ class Tractor(Wavelet):
         
         G = np.zeros(x.shape)
         if(np.any(mask)):  # only do this if there is an active point
-            print(mask)
+#            print("x", x.shape)
+#            print("rprime", rprime.shape)
+#            print("rprimeLen", rprimeLen.shape)
+#            print("rprimeLen[mask]", rprimeLen[mask].shape)
+#            print(mask)
             
             # distance dependence from source
             Id = self.A*(np.sqrt(self.Rmax) - np.sqrt(rprimeLen[mask]))
@@ -105,26 +153,26 @@ class Tractor(Wavelet):
             
             gradId = self.A*(np.sqrt(self.Rmax) + 0.5/np.sqrt(rprimeLen[mask]))
             gradId = gradId[:,np.newaxis] * gradrprime
-            print("gradId", gradId.shape)
+#            print("gradId", gradId.shape)
             gradIa = (self.dir - cosTheta*gradrprime)/rprimeLen[mask]
-            print("gradIa", gradIa.shape)
+#            print("gradIa", gradIa.shape)
             
             relpos = rprimeLen[mask] - self.v*self.lifetime
             gradW = np.where(relpos>0, -2.0/self.L, 0.0) # 0 at peak of np.abs
             gradW = np.where(relpos<0, +2.0/self.L, gradW)
             gradW = gradW * gradrprime
-            print("gradW", gradW.shape)
+#            print("gradW", gradW.shape)
             
     
             # chain rule the contributions
             Ia = Ia[:,np.newaxis]
             Id = Id[:,np.newaxis]
             W = W[:,np.newaxis]
-            print("W", W.shape)
-            print("G", G.shape)
-            print("mask", mask.shape)
-            print("G[mask]", G[mask[:,np.newaxis]].shape)
-            G[mask[:,np.newaxis]] = (gradId*Ia + Id*gradIa)*W + Id*Ia*gradW
+#            print("W", W.shape)
+#            print("G", G.shape)
+#            print("mask", mask.shape)
+#            print("G[mask]", G[mask].shape)
+            G[mask] = (gradId*Ia + Id*gradIa)*W + Id*Ia*gradW
         
         return(G)
     

@@ -33,7 +33,7 @@ class Player(SpriteEntity):
         super().update(dt)
         
         # spin ship for demo of rotation
-        self.theta -= 0.01*dt*np.pi
+        self.theta -= dt*np.pi/2000. # 180 deg in 2 sec
         
         
         # every L/(2*v) seconds emit a tractor wavelet
@@ -42,10 +42,16 @@ class Player(SpriteEntity):
         if(self.tractorElapsed > 1000):
             self.tractorElapsed = 0.
             
-            direction = np.array([np.sin(self.theta), np.cos(self.theta)])
-            wl = Tractor(
-                    source=self.r/self.parentBrane.surfScale, # sim coords
-                    direction=direction
-                        )
+            # where the beam is heading
+            direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+            # source of the wave in sim coords
+            # a bit forward of player ship
+            start = self.r/self.parentBrane.surfScale + 7*direction 
+            wl = Tractor(source=start, direction=direction,
+                         v = 3.2e-2,
+                         L = 16,
+                         A = 0.3,
+                         Rmax = 128./self.parentBrane.surfScale, # in sim coords
+                         debug=True)
             wl.register(self.parentBrane)
         

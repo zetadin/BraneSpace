@@ -28,7 +28,7 @@ class Portal(SpriteEntity):
         super().update(dt)
         
         #rotation
-        self.theta += 0.025*dt*np.pi
+        self.theta += dt*np.pi/1000. # 180 deg/s
         
     def updateBrane(self, dt: float):
         """

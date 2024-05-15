@@ -81,7 +81,9 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         if(view.isOnScreen(self)):
             # scale & rotate the image
             zoom = float(self.size)*view.zoom/self.img.get_width()
-            surf = pygame.transform.rotozoom(self.img, self.theta, zoom)
+            surf = pygame.transform.rotozoom(self.img,
+                                             self.theta*180/np.pi, # in deg
+                                             zoom)
             
             # update position on screen
             rect = surf.get_rect(center=view.transform(self.r))
