@@ -149,17 +149,25 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             
             
             # gradients of components
-            gradrprime = - rprime[mask]/np.sqrt(rprimeLen[mask])[:,np.newaxis]
+            gradrprime = rprime[mask]/rprimeLen[mask][:,np.newaxis]
             
             gradId = self.A*(np.sqrt(self.Rmax) + 0.5/np.sqrt(rprimeLen[mask]))
             gradId = gradId[:,np.newaxis] * gradrprime
+            gradId = np.where(rprimeLen[mask][:,np.newaxis] < self.Rmax, gradId, 0.0)
+            
 #            print("gradId", gradId.shape)
-            gradIa = (self.dir[np.newaxis,:] - cosTheta[:,np.newaxis]*gradrprime)/rprimeLen[mask][:,np.newaxis]
+#            gradIa = (self.dir[np.newaxis,:] - cosTheta[:,np.newaxis]*gradrprime)/rprimeLen[mask][:,np.newaxis]
+            gradIa = self.dir[np.newaxis,:] - (cosTheta[:,np.newaxis]*gradrprime)/(rprimeLen[mask]*rprimeLen[mask])[:,np.newaxis]
+            # apply the max for angular dependence too
+            gradIa = np.where(cosTheta[:,np.newaxis] > np.cos(self.theta0),
+                             gradIa, 0.0)
 #            print("gradIa", gradIa.shape)
             
             relpos = rprimeLen[mask] - self.v*self.lifetime
-            gradW = np.where(relpos>0, -2.0/self.L, 0.0) # 0 at peak of np.abs
-            gradW = np.where(relpos<0, +2.0/self.L, gradW)
+            gradW = np.where(np.logical_and(relpos>0, relpos<0.5*self.L),
+                             -2.0/self.L, 0.0) # 0 at peak of np.abs
+            gradW = np.where(np.logical_and(relpos<0, relpos>-0.5*self.L),
+                             +2.0/self.L, gradW)
             gradW = gradW[:,np.newaxis] * gradrprime
 #            print("gradW", gradW.shape)
             
@@ -175,6 +183,8 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
 #            print("mask", mask.shape)
 #            print("G[mask]", G[mask].shape)
             G[mask] = (gradId*Ia + Id*gradIa)*W + Id*Ia*gradW
+            
+#            G[mask] = gradIa
         
         return(G)
     

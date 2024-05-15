@@ -75,7 +75,8 @@ class Brane(pygame.sprite.Sprite):
         screen = view.displaysurface
         
         # re-paint the surface from simulation
-        amp_arr = np.floor(np.clip(256*(self.I+1)/2, 0,255)).astype(np.uint8)
+#        self.I = np.zeros(self.I.shape)
+        amp_arr = np.floor(np.clip(256*(self.I*4.0+1)/2, 0,255)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
         amp_surf = pygame.surfarray.make_surface(amp_arr)
         
@@ -83,14 +84,13 @@ class Brane(pygame.sprite.Sprite):
         gcoords = self.coords.reshape((-1,2))
         grad_arr = self.computeForceAt(gcoords*self.surfScale)
         grad_arr = grad_arr.reshape((SIM_SIZE,SIM_SIZE,2))
-#        grad_I = np.linalg.norm(grad_arr, axis=-1)
         grad_colors = np.zeros((SIM_SIZE,SIM_SIZE,3)).astype(np.uint8)
         # x -> red
         grad_colors[:,:,0] = np.floor(np.clip(256*(grad_arr[:,:,0]+1)/2, 0,255)).astype(np.uint8)
         # y -> green
         grad_colors[:,:,1] = np.floor(np.clip(256*(grad_arr[:,:,1]+1)/2, 0,255)).astype(np.uint8)
         # alpha
-        grad_alpha = np.max(grad_colors[:,:,0:1], axis=-1)
+        grad_alpha = np.floor(np.clip(np.max(np.abs(grad_arr), axis=-1), 0.0, 0.1)*2550).astype(np.uint8)
     
         # new surface for gradient
         grad_surf = pygame.Surface((SIM_SIZE,SIM_SIZE), pygame.SRCALPHA, 32)
