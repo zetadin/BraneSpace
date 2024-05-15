@@ -62,9 +62,9 @@ class Brane(pygame.sprite.Sprite):
         self.elapsed += dt
         if(self.elapsed > 2000):
             self.elapsed = 0.
-            R = np.random.random((2))*SIM_SIZE
-            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
-            wl.register(self)
+#            R = np.random.random((2))*SIM_SIZE
+#            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
+#            wl.register(self)
 
 
     def draw(self, view):
@@ -81,7 +81,7 @@ class Brane(pygame.sprite.Sprite):
         
         # gradient
         gcoords = self.coords.reshape((-1,2))
-        grad_arr = self.computeForceAt(gcoords)
+        grad_arr = self.computeForceAt(gcoords*self.surfScale)
         grad_arr = grad_arr.reshape((SIM_SIZE,SIM_SIZE,2))
 #        grad_I = np.linalg.norm(grad_arr, axis=-1)
         grad_colors = np.zeros((SIM_SIZE,SIM_SIZE,3)).astype(np.uint8)

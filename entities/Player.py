@@ -39,19 +39,19 @@ class Player(SpriteEntity):
         # every L/(2*v) seconds emit a tractor wavelet
         
         self.tractorElapsed += dt
-#        if(self.tractorElapsed > 1000):
-#            self.tractorElapsed = 0.
-#            
-#            # where the beam is heading
-#            direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
-#            # source of the wave in sim coords
-#            # a bit forward of player ship
-#            start = self.r/self.parentBrane.surfScale + 7*direction 
-#            wl = Tractor(source=start, direction=direction,
-#                         v = 3.2e-2,
-#                         L = 16,
-#                         A = 0.3,
-#                         Rmax = 128./self.parentBrane.surfScale, # in sim coords
-#                         debug=True)
-#            wl.register(self.parentBrane)
+        if(self.tractorElapsed > 1000):
+            self.tractorElapsed = 0.
+            
+            # where the beam is heading
+            direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+            # source of the wave in sim coords
+            # a bit forward of player ship
+            start = self.r/self.parentBrane.surfScale + 7*direction 
+            wl = Tractor(source=start, direction=direction,
+                         v = 3.2e-2,
+                         L = 16,
+                         A = 0.3,
+                         Rmax = 128./self.parentBrane.surfScale, # in sim coords
+                         debug=True)
+            wl.register(self.parentBrane)
         
