@@ -21,7 +21,7 @@ class Player(SpriteEntity):
         self.size = 64 # px
         
         # physics properties
-        self.mass = 5.0e8
+        self.mass = 5.0e3
         self.dragCoef = 0.2
         # coordinates in world space
         self.r = np.array([WIDTH/3, WIDTH/3])
@@ -38,9 +38,8 @@ class Player(SpriteEntity):
         
         
         # every L/(2*v) seconds emit a tractor wavelet
-        
         self.tractorElapsed += dt
-        pulseTime = 16.0*0.5/3.2e-2
+        pulseTime = 8.0*0.5/3.2e-2
         if(self.tractorElapsed > pulseTime):
             self.tractorElapsed -= pulseTime
             
@@ -48,13 +47,13 @@ class Player(SpriteEntity):
             direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
             # source of the wave in sim coords
             # a bit forward of player ship
-            start = self.r/self.parentBrane.surfScale + 7*direction 
+            start = self.r/self.parentBrane.surfScale + 3*direction 
             wl = Tractor(source=start, direction=direction,
                          v = 3.2e-2,
-                         L = 16,
+                         L = 8.0,
                          A = 0.1,
                          Rmax = 128./self.parentBrane.surfScale, # in sim coords
-                         debug=True)
+                         debug=False)
             wl.alive = self.tractorElapsed
             wl.register(self.parentBrane)
         

@@ -20,9 +20,12 @@ view = View()
 cur_brane = Brane()
 cur_brane.register()
 
-ball = Ball()
-ball.r = np.array([WIDTH*0.5, WIDTH*0.5])
-ball.register(cur_brane)
+for i in range(100):
+    ball = Ball()
+#    ball.r = np.array([WIDTH*0.5, WIDTH*0.5])
+    ball.r = np.random.random(2)*WIDTH
+    ball.v = (np.random.random(2) - 0.5)*0.2
+    ball.register(cur_brane)
 
 player = Player()
 player.register(cur_brane)

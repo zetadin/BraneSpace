@@ -87,17 +87,10 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         rprime = x - self.R[np.newaxis,np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
         
-#        print(self.R)
-#        print(rprimeLen.shape, np.min(rprimeLen), np.max(rprimeLen))
-        
-        
         # Wavelet window, triangular: ___/\___
         W = 1.0 - 2.0*np.abs(rprimeLen - self.v*self.lifetime)/self.L
         mask = W>0.
         W = W[mask]
-        
-#        raise()
-
         
         I = np.zeros((x.shape[0], x.shape[1]))
         if(np.any(mask)):  # only do this if there is an active point
@@ -131,11 +124,6 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         
         G = np.zeros(x.shape)
         if(np.any(mask)):  # only do this if there is an active point
-#            print("x", x.shape)
-#            print("rprime", rprime.shape)
-#            print("rprimeLen", rprimeLen.shape)
-#            print("rprimeLen[mask]", rprimeLen[mask].shape)
-
             
             # distance dependence from source
             Id = self.A*(np.sqrt(self.Rmax) - np.sqrt(rprimeLen[mask]))
@@ -155,13 +143,12 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             gradId = gradId[:,np.newaxis] * gradrprime
             gradId = np.where(rprimeLen[mask][:,np.newaxis] < self.Rmax, gradId, 0.0)
             
-#            print("gradId", gradId.shape)
-#            gradIa = (self.dir[np.newaxis,:] - cosTheta[:,np.newaxis]*gradrprime)/rprimeLen[mask][:,np.newaxis]
+
             gradIa = self.dir[np.newaxis,:] - (cosTheta[:,np.newaxis]*gradrprime)/(rprimeLen[mask]*rprimeLen[mask])[:,np.newaxis]
             # apply the max for angular dependence too
             gradIa = np.where(cosTheta[:,np.newaxis] > np.cos(self.theta0),
                              gradIa, 0.0)
-#            print("gradIa", gradIa.shape)
+
             
             relpos = rprimeLen[mask] - self.v*self.lifetime
             gradW = np.where(np.logical_and(relpos>0, relpos<0.5*self.L),
@@ -169,22 +156,13 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             gradW = np.where(np.logical_and(relpos<0, relpos>-0.5*self.L),
                              +2.0/self.L, gradW)
             gradW = gradW[:,np.newaxis] * gradrprime
-#            print("gradW", gradW.shape)
-            
     
             # chain rule the contributions
             Ia = Ia[:,np.newaxis]
             Id = Id[:,np.newaxis]
             W = W[:,np.newaxis]
-#            print("Ia", Ia.shape)
-#            print("Id", Id.shape)
-#            print("W", W.shape)
-#            print("G", G.shape)
-#            print("mask", mask.shape)
-#            print("G[mask]", G[mask].shape)
+
             G[mask] = (gradId*Ia + Id*gradIa)*W + Id*Ia*gradW
-            
-#            G[mask] = gradIa
         
         return(G)
     
