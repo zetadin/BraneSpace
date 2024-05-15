@@ -74,8 +74,8 @@ class Wavelet:
 
         G = np.zeros(x.shape)
         if(np.any(mask)):  # only do this if there is an active point
-            G[mask] = self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime)
-            G[mask]*= rprime[mask,:] * self.k/(2*distMat[mask])
+            G[mask] = (self.A*np.cos(self.k*distMat[mask] - self.w*self.lifetime))[:,np.newaxis]
+            G[mask]*= rprime[mask,:] * self.k/(2*distMat[mask])[:,np.newaxis]
             G[mask]/= self.v*self.lifetime # Conserve intensity with time
         
         return(G)
