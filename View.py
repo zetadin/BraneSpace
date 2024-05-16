@@ -17,6 +17,9 @@ HEIGHT = 600
 WIDTH = 600
 FPS = 60
 
+# cached value for optimization
+SQRT2 = np.sqrt(2)
+
 class View():
     def __init__(self):
         pygame.init()
@@ -42,7 +45,7 @@ class View():
         Check if entity is in screen area and should be drawn.
         """
         dif = np.abs(self.center - ent.r)
-        cond = dif < (0.5*self.screen_box + ent.size*np.sqrt(2))/self.zoom
+        cond = dif < (0.5*self.screen_box + ent.size*SQRT2)/self.zoom
         return(np.all(cond))
         
     def transform(self, r: npt) -> npt:

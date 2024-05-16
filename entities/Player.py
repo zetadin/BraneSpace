@@ -28,6 +28,9 @@ class Player(SpriteEntity):
         self.theta = -np.pi*0.5
         
         self.tractorElapsed = 0.0
+        self.tractorActive = True
+        self.collect_radius = 5.
+        self.collect_radius_sq = self.collect_radius*self.collect_radius
         
         self.score = 0
         
@@ -35,7 +38,7 @@ class Player(SpriteEntity):
     def update(self, dt: float):
         super().update(dt)
         
-        self.score += int(dt)
+        # self.score += int(dt)
         
         # spin ship for demo of rotation
         self.theta -= dt*np.pi/4000. # 180 deg in 2 sec
@@ -60,6 +63,18 @@ class Player(SpriteEntity):
                          debug=False)
             wl.alive = self.tractorElapsed
             wl.register(self.parentBrane)
+        
+        
+        # attemp loot pickup
+        direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+        self.collector_r = self.r + self.collect_radius*direction
+        
+        
+    def attemptPickUp(self, collectables: list, view: "View"):
+        """Call after update() of all entities."""
+        if(self.tractorActive):
+            for e in collectables:
+                e.attemptPickUp(self, view)
         
         
             

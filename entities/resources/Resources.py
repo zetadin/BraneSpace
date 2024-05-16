@@ -6,10 +6,52 @@ Created on Thu May 16 15:02:29 2024
 @author: zetadin
 """
 
+import numpy as np
+import numpy.typing as npt
 import pygame
 from entities.Entity import SpriteEntity
+from Universe import updatables, drawables, collectables
 
-class DarkMatter(SpriteEntity):
+
+class Collectable(SpriteEntity):
+    """
+    A SpriteEntity that can be picked up.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)  # forwards all unused arguments
+        
+    def register(self, brane: "Brane"):
+        """Add to the list of objects in the universe."""
+        super().register(brane)
+        collectables.append(self)
+        
+    def addToPlayer(self, player: "Player"):
+        """
+        Should be overwritten by children.
+        Set which Player property to increment.
+        """
+        pass
+        
+    def attemptPickUp(self, player: "Player", view: "View"):
+        # culling, can't pick up things far away anyway
+        if(view.isOnScreen(self)):
+            
+            dif = np.abs(player.collector_r - self.r) - self.size
+            distsq = np.sum(dif*dif)
+            
+            # if player can reach
+            if(distsq<player.collect_radius_sq):
+                # give to the player
+                self.addToPlayer(player)
+                
+                # remove instance from object lists
+                collectables.remove(self)
+                updatables.remove(self)
+                drawables.remove(self)
+                # this instance can now be garbage collected
+
+
+class DarkMatter(Collectable):
     def __init__(self):
         super().__init__()
         
@@ -22,7 +64,9 @@ class DarkMatter(SpriteEntity):
         self.dragCoef = 0.05
 
         
-    def update(self, dt: float):
-        super().update(dt)
-        
-        # does not rotate
+    def addToPlayer(self, player: "Player"):
+        """
+        Set which Player property to increment.
+        """
+        # for now just put into the score
+        player.score += 1

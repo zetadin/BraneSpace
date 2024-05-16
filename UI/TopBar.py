@@ -6,9 +6,10 @@ Created on Thu May 16 12:59:10 2024
 @author: zetadin
 """
 
+import numpy as np
+import numpy.typing as npt
 import pygame
 from pygame.locals import *
-import numpy as np
 from View import View
 
 
@@ -16,6 +17,10 @@ class TopBar(pygame.sprite.Sprite):
     def __init__(self, view: View):
         self.bkgImg = pygame.image.load("assets/UI/RustedMetal.png").convert()
         self.border = pygame.image.load("assets/UI/Toolbar_edge_128.png").convert()
+        self.darkMatterImg = pygame.image.load("assets/entities/resources/dark_matter.png").convert_alpha()
+        fillWColor(self.darkMatterImg,
+                    np.array([200,200,200], dtype=np.uint8)
+                   )
         
         self.player = None
         
@@ -68,6 +73,9 @@ class TopBar(pygame.sprite.Sprite):
                 rect=self.scoreCell.get_rect(),
                 width=self.cellBorder,
                 border_radius = self.cellRadius)
+        temp_size = (self.cellHeight-4,self.cellHeight-4)
+        temp_surf = pygame.transform.smoothscale(self.darkMatterImg, temp_size)
+        self.scoreCell.blit(temp_surf, (2,2))
         
     def bindPlayer(self, player: "Player"):
         self.player = player      
@@ -110,3 +118,14 @@ class TopBar(pygame.sprite.Sprite):
         
         
         
+        
+        
+def fillWColor(surface, color: npt):
+    """Helper function to recolor a surface."""
+    # get array of color info
+    a = np.array(surface.get_view('3'), copy=False)
+    # overwrite cwith color, keep alpha
+    a[:,:] = color
+    # delete it to unlock surface and allow blit 
+    del a 
+    

@@ -12,7 +12,7 @@ from entities.SimpleObjects import Ball
 from entities.resources.Resources import DarkMatter
 from entities.structures.Portal import Portal
 from entities.Player import Player
-from Universe import updatables, drawables
+from Universe import updatables, drawables, collectables
 from UI.TopBar import TopBar
 
 
@@ -58,6 +58,9 @@ while True:
     # update objects
     for entity in updatables:
         entity.update(dt)
+        
+    # attepmpt picking up collectables
+    player.attemptPickUp(collectables, view)
      
     # wipe screen 
     view.displaysurface.fill((0,0,0))
