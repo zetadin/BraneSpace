@@ -32,6 +32,7 @@ class View():
         # fonts
         pygame.font.init()
         self.serif_font = pygame.font.SysFont('liberationserif', 18)
+        self.serif_font_px_size = 24 # size in pixels
         
         self.zoom = 1.
         self.center = self.screen_box*0.5 # in world coords

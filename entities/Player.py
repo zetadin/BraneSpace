@@ -29,9 +29,13 @@ class Player(SpriteEntity):
         
         self.tractorElapsed = 0.0
         
+        self.score = 0
+        
         
     def update(self, dt: float):
         super().update(dt)
+        
+        self.score += int(dt)
         
         # spin ship for demo of rotation
         self.theta -= dt*np.pi/4000. # 180 deg in 2 sec

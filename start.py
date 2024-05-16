@@ -12,9 +12,14 @@ from entities.SimpleObjects import Ball
 from entities.structures.Portal import Portal
 from entities.Player import Player
 from Universe import updatables, drawables
+from UI.TopBar import TopBar
 
 
 view = View()
+
+# init UI
+tb = TopBar(view)
+
         
 # init objects in universe
 cur_brane = Brane()
@@ -29,6 +34,7 @@ for i in range(100):
 
 player = Player()
 player.register(cur_brane)
+tb.bindPlayer(player)
 
 portal = Portal()
 portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
@@ -59,14 +65,11 @@ while True:
     # draw everything
     for entity in drawables:
         entity.draw(view)
+        
+        
+    # draw the UI
+    tb.draw(view)
  
-    # show FPS
-    fps_surface = view.serif_font.render(
-            f"FPS: {view.FramePerSec.get_fps():.0f}",
-            False, (180, 255, 150)
-            )
-    view.displaysurface.blit(fps_surface, (5,5))
-    
     # push to frame buffer
     pygame.display.update()
     
