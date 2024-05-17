@@ -10,7 +10,8 @@ import sys
 sys.path.append("..") # enables entities import
 
 
-from multiprocessing import Process, Queue, Value, Array
+from multiprocessing import Process, Queue, set_start_method
+from multiprocessing.shared_memory import SharedMemory
 from entities.Entity import SpriteEntity
 import numpy as np
 import ctypes
@@ -26,17 +27,18 @@ class ParallelSpriteEntity(SpriteEntity):
         super().__init__(*args, **kwargs)
         
         #overwrite r,v with shared memory substitutes
-        shared_arr = Array(ctypes.c_double, 2)
-        r = np.frombuffer(shared_arr.get_obj())
-        with shared_arr.get_lock():
-            r[:] = self.r
-            self.r = r
-            
-        shared_arr = Array(ctypes.c_double, 2)
-        v = np.frombuffer(shared_arr.get_obj())
-        with shared_arr.get_lock():
-            v[:] = self.v
-            self.v = v
+        self.r_shm = SharedMemory(create=True, size=self.r.nbytes)
+        r = np.ndarray(shape=(2,), dtype=np.float64, buffer=self.r_shm.buf)
+        r[:] = self.r[:]
+        self.r = r
+        
+        self.v_shm = SharedMemory(create=True, size=self.v.nbytes)
+        v = np.ndarray(shape=(2,), dtype=np.float64, buffer=self.v_shm.buf)
+        v[:] = self.v[:]
+        self.v = v
+        
+        
+
                 
     def update(self, dt: float):
         """Update with a random force so no need to ask Brane."""
@@ -55,7 +57,24 @@ class ParallelSpriteEntity(SpriteEntity):
         
     def __getstate__(self):
         # pickle everything except the image for Queue insertion
-        return {k:v for (k, v) in self.__dict__.items() if k!="img"}
+        disregard=["img","r","v"]
+        return {k:v for (k, v) in self.__dict__.items() if not k in disregard}
+    
+    def __setstate__(self, state):
+        # store all attributes when unpickling
+        self.__dict__.update(state)
+        
+        # add numpy arrays for SharedMemory regions
+        self.r = np.ndarray(shape=(2,), dtype=np.float64, buffer=self.r_shm.buf)
+        self.v = np.ndarray(shape=(2,), dtype=np.float64, buffer=self.v_shm.buf)
+        
+    def close(self):
+        self.r_shm.close()
+        self.v_shm.close()
+        
+    def unlink(self):
+        self.r_shm.unlink()
+        self.v_shm.unlink()
     
     
 
@@ -78,16 +97,21 @@ class Worker(Process):
                     self.myEntities.append(e)
                 else:
                     stop=True
+                    
+            # exit if asked to
+            if(stop):
+                for e in self.myEntities:
+                    # close shared memory for Worker process
+                    e.close()
+                    # tell GUI side to delete Entity as well
+                    self.destructionQueue.put(e.drawablesKey)
+                del self.myEntities
+                break
             
             # update the entities
             dt = 1.
             for e in self.myEntities:
                 e.update(dt)
-                
-            # exit if asked to
-            if(stop):
-                del self.myEntities
-                break
             
             sleep(0.02)
             
@@ -95,24 +119,57 @@ class Worker(Process):
 
 def test_shared_memory():
     
+    set_start_method('fork')
+        
+    cQ = Queue()
+    dQ = Queue()
+    
+    # create Process
+    worker = Worker(cQ, dQ)
+    worker.start()
+    
+    # create Entity
     sharedEnt = ParallelSpriteEntity(mass=100.0, drag=0.3)
     sharedEnt.r[:] = [5.0,5.0]
     sharedEnt.v[:] = [0.01,-0.01]
     
-    cQ = Queue()
-    dQ = Queue()
-    
-    subprocess = Worker(cQ, dQ)
-    subprocess.start()
+    # store Entity into dict of drawables
+    drawables = {} # a dict with unique keys
+    lastDrawablesKey = -1
+    lastDrawablesKey+=1
+    drawables[lastDrawablesKey] = sharedEnt
+    sharedEnt.drawablesKey = lastDrawablesKey
     
     cQ.put(sharedEnt)
+    del sharedEnt
     
+    # wait and read new position
     sleep(0.1)
-    print("Reading: r=", sharedEnt.r)
+    print("Reading: r=", drawables[lastDrawablesKey].r)
+    # check that we see position change in GUI process
+    assert(np.all(drawables[lastDrawablesKey].r != 5.0))
+    
+    # stop Worker Process
     cQ.put("STOP")
     cQ.close()
+    worker.join()
+    
+    # handle any events in the destruction Queue
+    while(not dQ.empty()):
+        key = dQ.get()
+        # close shared memory for GUI side
+        drawables[key].close()
+        # free shared memory for GUI side
+        drawables[key].unlink()
+        # remove Entity from drawables
+        del drawables[key]
     dQ.close()
-    subprocess.join()
     
     
-    assert(np.all(sharedEnt.r != 5.0))
+    
+
+    
+    
+    
+if __name__ == "__main__":
+    test_shared_memory()
