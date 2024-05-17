@@ -10,11 +10,10 @@ import sys
 sys.path.append("..") # enables entities import
 
 
-from multiprocessing import Process, Queue, set_start_method
+from multiprocessing import Process, Queue, Barrier, set_start_method
 from multiprocessing.shared_memory import SharedMemory
 from entities.Entity import SpriteEntity
 import numpy as np
-import ctypes
 from time import sleep
 
 
@@ -56,7 +55,8 @@ class ParallelSpriteEntity(SpriteEntity):
         print("Updating: r=", self.r)
         
     def __getstate__(self):
-        # pickle everything except the image for Queue insertion
+        # pickle everything except the image ndarrays pointing to shared memory
+        # will be used for Queue insertion
         disregard=["img","r","v"]
         return {k:v for (k, v) in self.__dict__.items() if not k in disregard}
     
@@ -69,20 +69,23 @@ class ParallelSpriteEntity(SpriteEntity):
         self.v = np.ndarray(shape=(2,), dtype=np.float64, buffer=self.v_shm.buf)
         
     def close(self):
+        print("closing shms:", self.r_shm.name, self.v_shm.name)
         self.r_shm.close()
         self.v_shm.close()
         
     def unlink(self):
+        print("unlinking shms:", self.r_shm.name, self.v_shm.name)
         self.r_shm.unlink()
         self.v_shm.unlink()
     
     
 
 class Worker(Process):
-    def __init__(self, creationQueue, destructionQueue, **kwargs):
+    def __init__(self, creationQueue, destructionQueue, barrier, **kwargs):
         super().__init__(**kwargs)
         self.creationQueue = creationQueue
         self.destructionQueue = destructionQueue
+        self.barrier = barrier
         
         self.myEntities = []
         
@@ -100,12 +103,25 @@ class Worker(Process):
                     
             # exit if asked to
             if(stop):
+                from multiprocessing.resource_tracker import unregister
                 for e in self.myEntities:
                     # close shared memory for Worker process
                     e.close()
+                    # unregister it from resource_tracker
+                    # it got registered there a second time when unpickled
+                    # from Queue
+                    unregister(e.r_shm._name, "shared_memory")
+                    unregister(e.v_shm._name, "shared_memory")
                     # tell GUI side to delete Entity as well
                     self.destructionQueue.put(e.drawablesKey)
                 del self.myEntities
+                
+                # don't end process until GUI process unlinks SharedMemory
+                self.barrier.wait()
+                self.barrier.reset()
+                print("Worker waiting to exit.")
+                self.barrier.wait()
+                print("Worker exiting.")
                 break
             
             # update the entities
@@ -125,7 +141,8 @@ def test_shared_memory():
     dQ = Queue()
     
     # create Process
-    worker = Worker(cQ, dQ)
+    barrier = Barrier(2) # 2 processes
+    worker = Worker(cQ, dQ, barrier)
     worker.start()
     
     # create Entity
@@ -152,7 +169,10 @@ def test_shared_memory():
     # stop Worker Process
     cQ.put("STOP")
     cQ.close()
-    worker.join()
+    
+    # wait for Worker to put all remaining entities into dQ
+    barrier.wait()
+    print("GUI freeing memory.")
     
     # handle any events in the destruction Queue
     while(not dQ.empty()):
@@ -165,8 +185,19 @@ def test_shared_memory():
         del drawables[key]
     dQ.close()
     
+    # wait for worker to finish
+    barrier.wait()
+    print("GUI waiting for Worker to exit.")
+    worker.join()
+    sleep(0.2)
+    print("GUI exiting.")
     
-    
+#    print("\n\nResourceTracker record:")
+#    from multiprocessing.resource_tracker import getfd
+#    fd = getfd()
+#    with open(fd, 'rb') as f:
+#            for line in f:
+#                print(line)
 
     
     
