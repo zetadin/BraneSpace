@@ -8,16 +8,27 @@ Created on Fri May 10 13:49:55 2024
 
 import pygame
 
-
-SIM_SIZE = 128
+class Universe():
+    def __init__(self, simsize: int = 128, parallel=False):
+        if(simsize<=0):
+            raise ValueError("simsize has to be a positive integer.")
+        self.simsize = simsize
+        self.parallel = parallel
+        
+        self.drawables = pygame.sprite.Group()
+        self.updatables=[]
+        self.collectables=[]
+        
+        # if we use multiple cores, create a shared memory
+        # to hold entity positions and velocities
+        # as they will be updated in the physics process
+        if(self.parallel):
+            pass
+            
+universe = Universe(128, parallel=False)
+SIM_SIZE = universe.simsize
 
 # game object lists for this universe
-drawables = pygame.sprite.Group()
-updatables = []
-collectables = []
-
-
-#def reset():
-#    global drawables, updatables
-#    drawables = pygame.sprite.Group()
-#    updatables = []
+drawables = universe.drawables
+updatables = universe.updatables
+collectables = universe.collectables
