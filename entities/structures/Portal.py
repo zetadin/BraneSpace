@@ -9,9 +9,9 @@ Created on Fri May 10 15:01:10 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.Entity import SpriteEntity
+from entities.structures.Structure import Structure
 
-class Portal(SpriteEntity):
+class Portal(Structure):
     def __init__(self):
         super().__init__()
         
@@ -29,9 +29,3 @@ class Portal(SpriteEntity):
         
         #rotation
         self.theta += dt*np.pi/1000. # 180 deg/s
-        
-    def updateBrane(self, dt: float):
-        """
-        Update brane's intensity with local effects
-        """
-        pass
