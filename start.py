@@ -14,6 +14,7 @@ from entities.structures.Portal import Portal
 from entities.Player import Player
 from Universe import updatables, drawables, collectables
 from UI.TopBar import TopBar
+import time
 
 
 view = View()
@@ -47,6 +48,9 @@ filler.register(cur_brane)
 # initial guess at frame time
 dt = 1000./FPS
 
+updatesPerFrame = 1     # start with 1
+maxUpdatesPerFrame = 4  # increase to this many if fast enough
+update_dt = dt/updatesPerFrame
 
 # game loop
 while True:
@@ -55,12 +59,28 @@ while True:
             pygame.quit()
             sys.exit()
             
-    # update objects
-    for entity in updatables:
-        entity.update(dt)
+    update_ms_left = min(dt, 1000./FPS)*0.8
+    update_ms = 1000
+    for u in range(updatesPerFrame):
+        startTime = time.time()
         
-    # attepmpt picking up collectables
-    player.attemptPickUp(collectables, view)
+        # update objects
+        for entity in updatables:
+            entity.update(update_dt)
+            
+        # attepmpt picking up collectables
+        player.attemptPickUp(collectables, view)
+        
+        update_ms = (time.time()-startTime)*1000.
+        update_ms_left -= update_ms
+        # remainingUpdates = updatesPerFrame - 1 - u
+        if(update_ms_left < update_ms and u+1!=updatesPerFrame):
+            # not enough time for another update,
+            # and this is not the last scheduled one
+            break
+            
+    
+    
      
     # wipe screen 
     view.displaysurface.fill((0,0,0))
@@ -78,5 +98,10 @@ while True:
     
     # wait for next frame
     dt = view.FramePerSec.tick(FPS)
+    
+    # recalculate updatesPerFrame
+    updatesPerFrame = min(int(min(dt, 1000./FPS)*0.8/update_ms), maxUpdatesPerFrame)
+    updatesPerFrame = max(1, updatesPerFrame)
+    update_dt = dt/updatesPerFrame
     
     
