@@ -34,15 +34,15 @@ class Player(SpriteEntity):
         
         self.score = 0
         
+        self.rot_speed = np.pi/2000. # 180 deg in 1 sec        
+        self.rotationDirection = 0.0
+        
         
     def update(self, dt: float):
         super().update(dt)
         
-        # self.score += int(dt)
-        
-        # spin ship for demo of rotation
-        self.theta -= dt*np.pi/4000. # 180 deg in 2 sec
-        
+        # update ship rotation        
+        self.theta += dt*self.rot_speed*self.rotationDirection
         
         # every L/(2*v) seconds emit a tractor wavelet
         self.tractorElapsed += dt

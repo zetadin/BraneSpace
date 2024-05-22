@@ -54,10 +54,24 @@ update_dt = dt/updatesPerFrame
 
 # game loop
 while True:
+    
+    # event processing
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                player.rotationDirection = +1.0
+            if event.key == pygame.K_RIGHT:
+                player.rotationDirection = -1.0
+                
+        if event.type == pygame.KEYUP:
+            if event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
+                player.rotationDirection = 0.0
+            
+            
             
     update_ms_left = min(dt, 1000./FPS)*0.8
     update_ms = 1000
