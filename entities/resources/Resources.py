@@ -32,15 +32,28 @@ class Collectable(SpriteEntity):
         """
         pass
         
-    def attemptPickUp(self, player: "Player", view: "View"):
+    def attemptPickUp(self, player: "Player", view: "View", dt: float):
         # culling, can't pick up things far away anyway
+        sucess = False
         if(view.isOnScreen(self)):
             
-            dif = np.abs(player.collector_r - self.r) - self.size
-            distsq = np.sum(dif*dif)
+            # line segment to circle collision
+            # stationary circle by changing velocity of Collectable
+            vdt = (self.v - player.collector_v) * dt # start to end
+            x   = self.r - vdt                   # start pos
+            cx  = player.collector_r - x         # start to center
+            ce  = player.collector_r - self.r    # end to center
             
-            # if player can reach
-            if(distsq<player.collect_radius_sq):
+            if(np.dot(cx,cx)<=player.collect_radius_sq):
+                sucess = True
+            elif(np.dot(ce,ce)<=player.collect_radius_sq):
+                sucess = True
+            else:
+                u = np.dot(cx, vdt)/np.dot(vdt,vdt)
+                if(u>=0.0 and u<=1.0):
+                    sucess = True
+        
+            if(sucess):
                 # give to the player
                 self.addToPlayer(player)
                 

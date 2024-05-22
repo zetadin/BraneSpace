@@ -95,7 +95,7 @@ while True:
             entity.update(update_dt)
             
         # attepmpt picking up collectables
-        player.attemptPickUp(collectables, view)
+        player.attemptPickUp(collectables, view, update_dt)
         
         update_ms = (time.time()-startTime)*1000.
         update_ms_left -= update_ms

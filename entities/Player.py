@@ -43,6 +43,11 @@ class Player(SpriteEntity):
         self.fwd = False
         self.bck = False
         
+        # collector motion
+        direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+        self.collector_r = self.r + self.collect_radius*direction
+        self.collector_v = np.zeros(2)
+        
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
         # remove the extra dimention used for multiple points
@@ -84,16 +89,20 @@ class Player(SpriteEntity):
             wl.register(self.parentBrane)
         
         
-        # attemp loot pickup
+        # collector motion
         direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
-        self.collector_r = self.r + self.collect_radius*direction
+        collector_newr = self.r + self.collect_radius*direction
+        self.collector_v = (collector_newr - self.collector_r)/dt
+        self.collector_r = collector_newr
         
         
-    def attemptPickUp(self, collectables: list, view: "View"):
+    def attemptPickUp(self, collectables: list, view: "View", dt: float):
         """Call after update() of all entities."""
         if(self.tractorActive):
+            # compute collector velocity
+            self.collector_v = self.v
             for e in collectables:
-                e.attemptPickUp(self, view)
+                e.attemptPickUp(self, view, dt)
         
         
             
