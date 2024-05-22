@@ -62,14 +62,26 @@ while True:
             sys.exit()
         
         if event.type == pygame.KEYDOWN:
+            # rotation
             if event.key == pygame.K_LEFT:
                 player.rotationDirection = +1.0
             if event.key == pygame.K_RIGHT:
                 player.rotationDirection = -1.0
+            # thrust
+            if event.key == pygame.K_UP:
+                player.fwd = True
+            if event.key == pygame.K_DOWN:
+                player.bck = True
                 
         if event.type == pygame.KEYUP:
+            # rotation
             if event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
                 player.rotationDirection = 0.0
+            # thrust
+            if event.key == pygame.K_UP:
+                player.fwd = False
+            if event.key == pygame.K_DOWN:
+                player.bck = False
             
             
             

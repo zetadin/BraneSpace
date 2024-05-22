@@ -22,7 +22,7 @@ class Player(SpriteEntity):
         
         # physics properties
         self.mass = 5.0e3
-        self.dragCoef = 0.2
+        self.dragCoef = 0.02
         # coordinates in world space
         self.r = np.array([WIDTH/3, WIDTH/3])
         self.theta = -np.pi*0.5
@@ -37,6 +37,25 @@ class Player(SpriteEntity):
         self.rot_speed = np.pi/2000. # 180 deg in 1 sec        
         self.rotationDirection = 0.0
         
+        self.fwdThrust = 2.0 # Newtons
+        self.bckThrust = 0.50  # Newtons
+        
+        self.fwd = False
+        self.bck = False
+        
+    def calcForce(self):
+        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
+        # remove the extra dimention used for multiple points
+        F = np.squeeze(F, axis=0)
+        
+        if(self.fwd):
+            direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+            F += direction * self.fwdThrust
+        if(self.bck):
+            direction = np.array([-np.sin(self.theta), -np.cos(self.theta)])
+            F -= direction * self.bckThrust
+        
+        return(F)
         
     def update(self, dt: float):
         super().update(dt)

@@ -32,9 +32,9 @@ class Entity():
         self.parentBrane = None
         
     def update(self, dt: float):
-        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
-        # remove the extra dimention used for multiple points
-        F = np.squeeze(F, axis=0)
+
+        # force
+        F = self.calcForce()
         
         # acelleration
         aNext = F/self.mass
@@ -45,6 +45,12 @@ class Entity():
         self.r += self.v*dt + 0.5*self.a
         self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
+        
+    def calcForce(self):
+        F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
+        # remove the extra dimention used for multiple points
+        F = np.squeeze(F, axis=0)
+        return(F)
 
     def register(self, brane: Brane):
         """Add to the list of objects in the universe."""
