@@ -100,7 +100,6 @@ class Player(SpriteEntity):
         Draw to screen
         """
         super().draw(view)
-        print("theta:", self.theta*180./np.pi, "\tdirection:", self.direction)
         
         # Debug shapes
         # collector zone
@@ -118,12 +117,12 @@ class Player(SpriteEntity):
                            ((0,L),(3,0),(5,L)),
                            width = 2
                           )
-        angle = np.arctan(self.collector_v[0]/self.collector_v[1])
-        if(self.collector_v[1]<0): # compensate for period of tan
+        angle = np.arctan(self.collector_v[0]/-self.collector_v[1])
+        if(self.collector_v[1]>0): # compensate for period of tan
             angle+=np.pi
         collector_vel = pygame.transform.rotozoom(
                 collector_vel,
-                angle*180/np.pi, # in deg CCW
+                -angle*180/np.pi, # in deg CCW
                 1
                 )
         rect = collector_vel.get_rect(center=view.transform(self.collector_r))
