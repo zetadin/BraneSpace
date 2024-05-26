@@ -95,6 +95,41 @@ class Player(SpriteEntity):
         self.collector_v = (collector_newr - self.collector_r)/dt
         self.collector_r = collector_newr
         
+    def draw(self, view):
+        """
+        Draw to screen
+        """
+        super().draw(view)
+        
+        # Debug shapes
+        # collector zone
+#        collector_zone = pygame.Surface(
+#                    (2*self.collect_radius, 2*self.collect_radius),
+#                    flags=pygame.SRCALPHA)
+        pygame.draw.circle(view.displaysurface, (0,0,255),
+                           (self.collector_r[0]+self.collect_radius,
+                            self.collector_r[1]+self.collect_radius),
+                           self.collect_radius
+                          )
+#        rect = collector_zone.get_rect(center=view.transform(self.collector_r))
+#        view.displaysurface.blit(collector_zone, rect)
+        
+        # collector velocity
+        L = np.linalg.norm(self.collector_v)*10
+        collector_vel = pygame.Surface((6, L), flags=pygame.SRCALPHA)
+        pygame.draw.polygon(collector_vel, (0,255,0),
+                           #((2,L),(2,2), (0,2),(3,0),(5,2), (3,2),(3,L)),
+                           ((0,L),(3,0),(5,L)),
+                           width = 1
+                          )
+        collector_vel = pygame.transform.rotozoom(
+                collector_vel,
+                -np.arctan(self.collector_v[0]/self.collector_v[1])*180/np.pi, # in deg CCW
+                1
+                )
+        rect = collector_vel.get_rect(center=view.transform(self.collector_r))
+        view.displaysurface.blit(collector_vel, rect)
+        
         
     def attemptPickUp(self, collectables: list, view: "View", dt: float):
         """Call after update() of all entities."""
