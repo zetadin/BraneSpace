@@ -11,7 +11,6 @@ from Universe import drawables
 import numpy as np
 import numpy.typing as npt
 import pygame
-from pygame.locals import *
 
 
 class Tractor(Wavelet, pygame.sprite.Sprite):
@@ -46,7 +45,8 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             pygame.sprite.Sprite.__init__(self) # manually init the Sprite
             
             self.size = 4
-            self.img = pygame.Surface((self.size, self.size), flags=SRCALPHA) 
+            self.img = pygame.Surface((self.size, self.size),
+                                      flags=pygame.SRCALPHA) 
             pygame.draw.circle(
                     surface=self.img, color=(0, 0, 255, 255),
                     center=(self.size/2, self.size/2), radius=2
@@ -74,7 +74,9 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         Draw to screen
         """
         # update position on screen
-        rect = self.img.get_rect(center=view.transform(self.R*self.parentBrane.surfScale))
+        rect = self.img.get_rect(
+                center=view.transform(self.R*self.parentBrane.surfScale)
+                )
         
         # draw to screen
         view.displaysurface.blit(self.img, rect)

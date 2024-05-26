@@ -28,4 +28,4 @@ class Portal(Structure):
         super().update(dt)
         
         #rotation
-        self.theta += dt*np.pi/1000. # 180 deg/s
+        self.theta -= dt*np.pi/1000. # 180 deg/s

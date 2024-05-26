@@ -8,7 +8,6 @@ Created on Fri May 10 13:31:16 2024
 
 import numpy as np
 import pygame
-from pygame.locals import *
 
 from Brane import Brane
 from Universe import updatables, drawables
@@ -68,7 +67,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         super().__init__(mass, drag)
         
         # create a temp image that will be overriden
-        self.img = pygame.Surface((16,16), flags=SRCALPHA)
+        self.img = pygame.Surface((16,16), flags=pygame.SRCALPHA)
         pygame.draw.rect(
                 surface=self.img, color=(255, 0, 0, 255),
                 rect=self.img.get_rect(),
@@ -87,9 +86,10 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         if(view.isOnScreen(self)):
             # scale & rotate the image
             zoom = float(self.size)*view.zoom/self.img.get_width()
-            surf = pygame.transform.rotozoom(self.img,
-                                             self.theta*180/np.pi, # in deg
-                                             zoom)
+            surf = pygame.transform.rotozoom(
+                    self.img,
+                    -self.theta*180./np.pi, # in deg CCW of North (Up)
+                    zoom)
             
             # update position on screen
             rect = surf.get_rect(center=view.transform(self.r))
