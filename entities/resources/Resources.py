@@ -44,14 +44,21 @@ class Collectable(SpriteEntity):
             cx  = player.collector_r - x         # start to center
             ce  = player.collector_r - self.r    # end to center
             
+            # end points in radius
             if(np.dot(cx,cx)<=player.collect_radius_sq):
                 sucess = True
             elif(np.dot(ce,ce)<=player.collect_radius_sq):
                 sucess = True
+            # projection in segment?
             else:
-                u = np.dot(cx, vdt)/np.dot(vdt,vdt)
+                vdtsq = np.dot(vdt,vdt)
+                u = np.dot(cx, vdt)/vdtsq
                 if(u>=0.0 and u<=1.0):
-                    sucess = True
+                    # check distance to center
+                    psq = u*u*vdtsq # (pos on start-end segment)^2
+                    dsq = np.dot(cx, cx) - psq # closest distance to center ^2
+                    if(dsq<=player.collect_radius_sq):
+                        sucess = True
         
             if(sucess):
                 # give to the player

@@ -29,7 +29,7 @@ class Player(SpriteEntity):
         
         self.tractorElapsed = 0.0
         self.tractorActive = True
-        self.collect_radius = 5.
+        self.collect_radius = 10.
         self.collect_radius_sq = self.collect_radius*self.collect_radius
         
         self.score = 0
@@ -101,32 +101,32 @@ class Player(SpriteEntity):
         """
         super().draw(view)
         
-        # Debug shapes
-        # collector zone
-        pygame.draw.circle(view.displaysurface, (0,0,255),
-                           (self.collector_r[0],
-                            self.collector_r[1]),
-                           self.collect_radius
-                          )
-                           
-        # collector velocity
-        L = np.ceil(np.linalg.norm(self.collector_v)*500)
-        collector_vel = pygame.Surface((6, L), flags=pygame.SRCALPHA)
-        pygame.draw.polygon(collector_vel, (0,255,0),
-                           #((2,L),(2,2), (0,2),(3,0),(5,2), (3,2),(3,L)),
-                           ((0,L),(3,0),(5,L)),
-                           width = 2
-                          )
-        angle = np.arctan(self.collector_v[0]/-self.collector_v[1])
-        if(self.collector_v[1]>0): # compensate for period of tan
-            angle+=np.pi
-        collector_vel = pygame.transform.rotozoom(
-                collector_vel,
-                -angle*180/np.pi, # in deg CCW
-                1
-                )
-        rect = collector_vel.get_rect(center=view.transform(self.collector_r))
-        view.displaysurface.blit(collector_vel, rect)
+#        # Debug shapes
+#        # collector zone
+#        pygame.draw.circle(view.displaysurface, (0,0,255),
+#                           (self.collector_r[0],
+#                            self.collector_r[1]),
+#                           self.collect_radius
+#                          )
+#                           
+#        # collector velocity
+#        L = np.ceil(np.linalg.norm(self.collector_v)*500)
+#        collector_vel = pygame.Surface((6, L), flags=pygame.SRCALPHA)
+#        pygame.draw.polygon(collector_vel, (0,255,0),
+#                           #((2,L),(2,2), (0,2),(3,0),(5,2), (3,2),(3,L)),
+#                           ((0,L),(3,0),(5,L)),
+#                           width = 2
+#                          )
+#        angle = np.arctan(self.collector_v[0]/-self.collector_v[1])
+#        if(self.collector_v[1]>0): # compensate for period of tan
+#            angle+=np.pi
+#        collector_vel = pygame.transform.rotozoom(
+#                collector_vel,
+#                -angle*180/np.pi, # in deg CCW
+#                1
+#                )
+#        rect = collector_vel.get_rect(center=view.transform(self.collector_r))
+#        view.displaysurface.blit(collector_vel, rect)
         
         
     def attemptPickUp(self, collectables: list, view: "View", dt: float):
