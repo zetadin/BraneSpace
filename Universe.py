@@ -18,6 +18,7 @@ class Universe():
         self.drawables = pygame.sprite.Group()
         self.updatables=[]
         self.collectables=[]
+        self.structures=[]
         
         # if we use multiple cores, create a shared memory
         # to hold entity positions and velocities
@@ -32,3 +33,4 @@ SIM_SIZE = universe.simsize
 drawables = universe.drawables
 updatables = universe.updatables
 collectables = universe.collectables
+structures = universe.structures

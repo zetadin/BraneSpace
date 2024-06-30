@@ -43,6 +43,8 @@ class Player(SpriteEntity):
         self.fwd = False
         self.bck = False
         
+        self.tractor = False
+        
         # collector motion
         self.direction = np.array([np.sin(self.theta), -np.cos(self.theta)])
         self.collector_r = self.r + self.collect_radius*self.direction
@@ -72,22 +74,23 @@ class Player(SpriteEntity):
         
         
         # every L/(2*v) seconds emit a tractor wavelet
-        self.tractorElapsed += dt
-        pulseTime = 8.0*0.5/3.2e-2
-        if(self.tractorElapsed > pulseTime):
-            self.tractorElapsed -= pulseTime
-            
-            # source of the wave in sim coords
-            # a bit forward of player ship
-            start = (self.r + 20*self.direction)/self.parentBrane.surfScale
-            wl = Tractor(source=start, direction=self.direction,
-                         v = 3.2e-2,
-                         L = 8.0,
-                         A = 0.1,
-                         Rmax = 128./self.parentBrane.surfScale, # in sim coords
-                         debug=False)
-            wl.alive = self.tractorElapsed
-            wl.register(self.parentBrane)
+        if(self.tractor):
+            self.tractorElapsed += dt
+            pulseTime = 8.0*0.5/3.2e-2
+            if(self.tractorElapsed > pulseTime):
+                self.tractorElapsed -= pulseTime
+                
+                # source of the wave in sim coords
+                # a bit forward of player ship
+                start = (self.r + 20*self.direction)/self.parentBrane.surfScale
+                wl = Tractor(source=start, direction=self.direction,
+                             v = 3.2e-2,
+                             L = 8.0,
+                             A = 0.1,
+                             Rmax = 128./self.parentBrane.surfScale, # in sim coords
+                             debug=False)
+                wl.alive = self.tractorElapsed
+                wl.register(self.parentBrane)
         
         
         # collector motion
