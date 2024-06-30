@@ -11,6 +11,7 @@ from entities.Entity import SpriteEntity
 from entities.SimpleObjects import Ball
 from entities.resources.Resources import DarkMatter
 from entities.structures.Portal import Portal
+from entities.hazards.Asteroid import Asteroid
 from entities.Player import Player
 from Universe import updatables, drawables, collectables
 from UI.TopBar import TopBar
@@ -27,23 +28,30 @@ tb = TopBar(view)
 cur_brane = Brane()
 cur_brane.register()
 
-for i in range(100):
+for i in range(20):
     loot = DarkMatter()
     loot.r = np.random.random(2)*WIDTH
     loot.v = (np.random.random(2) - 0.5)*0.05
     loot.register(cur_brane)
+    
+for i in range(20):
+    roid = Asteroid()
+    roid.r = np.random.random(2)*WIDTH
+    roid.v = (np.random.random(2) - 0.5)*0.01
+    roid.register(cur_brane)
+    
 
 player = Player()
 player.register(cur_brane)
 tb.bindPlayer(player)
 
-portal = Portal()
-portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
-portal.register(cur_brane)
-
-filler = SpriteEntity()
-filler.r = np.array([115.,215.])
-filler.register(cur_brane)
+#portal = Portal()
+#portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
+#portal.register(cur_brane)
+#
+#filler = SpriteEntity()
+#filler.r = np.array([115.,215.])
+#filler.register(cur_brane)
 
 # initial guess at frame time
 dt = 1000./FPS
@@ -63,25 +71,38 @@ while True:
         
         if event.type == pygame.KEYDOWN:
             # rotation
-            if event.key == pygame.K_LEFT:
+            if event.key in [pygame.K_LEFT, pygame.K_a]:
                 player.rotationDirection = -1.0
-            if event.key == pygame.K_RIGHT:
+            elif event.key in [pygame.K_RIGHT, pygame.K_d]:
                 player.rotationDirection = +1.0
             # thrust
-            if event.key == pygame.K_UP:
+            elif event.key in [pygame.K_UP, pygame.K_w]:
                 player.fwd = True
-            if event.key == pygame.K_DOWN:
+            elif event.key in [pygame.K_DOWN, pygame.K_s]:
                 player.bck = True
+            # tractor
+            elif event.key == pygame.K_SPACE:
+                player.tractor = True
                 
         if event.type == pygame.KEYUP:
             # rotation
-            if event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
+            if event.key in [pygame.K_LEFT, pygame.K_RIGHT,
+                             pygame.K_a, pygame.K_d]:
                 player.rotationDirection = 0.0
             # thrust
-            if event.key == pygame.K_UP:
+            elif event.key in [pygame.K_UP, pygame.K_w]:
                 player.fwd = False
-            if event.key == pygame.K_DOWN:
+            elif event.key in [pygame.K_DOWN, pygame.K_s]:
                 player.bck = False
+            # tractor
+            elif event.key == pygame.K_SPACE:
+                player.tractor = False
+                
+            # quit
+            elif event.key == pygame.K_ESCAPE:
+                pygame.event.post(pygame.event.Event(pygame.QUIT))
+                
+            
             
             
             
