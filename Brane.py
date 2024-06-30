@@ -43,9 +43,9 @@ class Brane(pygame.sprite.Sprite):
         
         self.drawGradients = False
         
-        # add initial wavelet
-        wl = Wavelet(v = VV, L=LL, A=2.5, source=np.array([16.,16.]))
-        wl.register(self)
+#        # add initial wavelet
+#        wl = Wavelet(v = VV, L=LL, A=2.5, source=np.array([16.,16.]))
+#        wl.register(self)
         
     def register(self):
         # put into game object lists

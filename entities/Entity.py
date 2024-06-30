@@ -102,3 +102,36 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         """Add to the list of objects in the universe."""
         super().register(brane)
         drawables.add(self)
+        
+    def checkCollision(self, other: "SpriteEntity", dt):
+        collided = False
+            
+        # Are they close enough and moving fast enough to collide on each axis?
+        
+        
+        # line segment to circle collision
+        # stationary circle by changingeffective velocity of self
+        vdt = (self.v - other.v) * dt # start to end
+        x   = self.r - vdt                   # start pos
+        cx  = other.r - x         # start to center
+        ce  = other.r - self.r    # end to center
+                
+        # end points in radius
+        collision_radius = 0.5*(self.size+other.size)
+        collision_radius_sq = collision_radius*collision_radius
+        if(np.dot(cx,cx)<=collision_radius_sq):
+            collided = True
+        elif(np.dot(ce,ce)<=collision_radius_sq):
+            collided = True
+        # projection in segment?
+        else:
+            vdtsq = np.dot(vdt,vdt)
+            u = np.dot(cx, vdt)/vdtsq
+            if(u>=0.0 and u<=1.0):
+                # check distance to center
+                psq = u*u*vdtsq # (pos on start-end segment)^2
+                dsq = np.dot(cx, cx) - psq # closest distance to center ^2
+                if(dsq<=collision_radius_sq):
+                    collided = True
+    
+        return(collided)

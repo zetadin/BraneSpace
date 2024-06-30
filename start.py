@@ -13,7 +13,7 @@ from entities.resources.Resources import DarkMatter
 from entities.structures.Portal import Portal
 from entities.hazards.Asteroid import Asteroid
 from entities.Player import Player
-from Universe import updatables, drawables, collectables
+from Universe import updatables, drawables, collectables, universe
 from UI.TopBar import TopBar
 import time
 
@@ -36,7 +36,7 @@ for i in range(20):
     
 for i in range(20):
     roid = Asteroid()
-    roid.r = np.random.random(2)*WIDTH
+    roid.r = np.random.random(2)*WIDTH*0.8 + 0.1*WIDTH
     roid.v = (np.random.random(2) - 0.5)*0.01
     roid.register(cur_brane)
     
@@ -57,8 +57,11 @@ tb.bindPlayer(player)
 dt = 1000./FPS
 
 updatesPerFrame = 1     # start with 1
-maxUpdatesPerFrame = 4  # increase to this many if fast enough
+maxUpdatesPerFrame = 1  # increase to this many if fast enough
 update_dt = dt/updatesPerFrame
+
+
+first_frame=True
 
 # game loop
 while True:
@@ -114,6 +117,12 @@ while True:
         # update objects
         for entity in updatables:
             entity.update(update_dt)
+            
+        # structure-structure collisions
+        if(first_frame):
+            first_frame = False
+        else:
+            universe.update(update_dt)
             
         # attepmpt picking up collectables
         player.attemptPickUp(collectables, view, update_dt)

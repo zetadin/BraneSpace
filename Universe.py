@@ -20,11 +20,39 @@ class Universe():
         self.collectables=[]
         self.structures=[]
         
+        self.destroy_these_structures=[]
+        
         # if we use multiple cores, create a shared memory
         # to hold entity positions and velocities
         # as they will be updated in the physics process
         if(self.parallel):
             pass
+        
+        
+    def destroy_requested(self):
+        """
+        Destroy entities after the update step.
+        Needs to be after update to avoid iterating through a missing entity.
+        """
+        for e in self.destroy_these_structures:
+            e.destroy()
+        self.destroy_these_structures=[]
+        
+        
+    def update(self, dt):
+        # check for structure-structure collisions
+        for i in range(len(self.structures)-1):
+            si = self.structures[i]
+            for j in range(i+1, len(self.structures)):
+                sj = self.structures[j]
+                if(si.checkCollision(sj, dt)):
+                    print(f"Structure collision: {i} & {j}")
+                    si.collided_with(sj)
+                    sj.collided_with(si)
+                    break
+                    
+        self.destroy_requested()
+            
             
 universe = Universe(128, parallel=False)
 SIM_SIZE = universe.simsize

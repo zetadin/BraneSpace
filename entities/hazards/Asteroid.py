@@ -10,7 +10,8 @@ import numpy as np
 import pygame
 from pygame.locals import *
 from entities.structures.Structure import Structure
-from Universe import updatables, drawables, structures
+from entities.resources.Resources import DarkMatter
+from Universe import universe
 
 class Asteroid(Structure):
     def __init__(self):
@@ -25,15 +26,25 @@ class Asteroid(Structure):
         self.dragCoef = 0.002
         
         self.rot_vel = np.random.uniform(-0.5, 0.5)*np.pi/1000 # +-90 deg/s
-
+        self.theta = np.random.uniform(-1, 1)*np.pi
         
     def update(self, dt: float):
         super().update(dt)
         
         #rotation
         self.theta -= dt*self.rot_vel
+
+    def collided_with(self, other):
+        """Handle collisions.
+        Asteroid gets destroyed and spawns some dark matter.
+        """
+        COM_v = (self.v*self.mass + other.v*other.mass)/(self.mass+other.mass)
+        for i in range(np.random.randint(1,3)):
+            loot = DarkMatter()
+            loot.r = self.r
+            loot.v = COM_v + (np.random.random(2) - 0.5)*0.05
+            loot.register(self.parentBrane)
+            
+        # request destruction, delayed until end of update
+        universe.destroy_these_structures.append(self)
         
-    def register(self, brane: "Brane"):
-        """Add to the list of objects in the universe."""
-        super().register(brane)
-        structures.append(self)
