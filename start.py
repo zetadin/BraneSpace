@@ -22,6 +22,7 @@ from entities.hazards.Explosion import Explosion
 
 universe.reset()
 view = View()
+view.debug = True
 
 # init UI
 tb = TopBar(view)

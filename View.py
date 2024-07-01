@@ -40,6 +40,8 @@ class View():
         self.zoom = 1.
         self.center = self.screen_box*0.5 # in world coords
         
+        self.debug = False
+        
     def isOnScreen(self, ent: "Entity") -> bool:
         """
         Check if entity is in screen area and should be drawn.

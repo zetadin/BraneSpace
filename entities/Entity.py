@@ -97,6 +97,14 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
             
             # draw to screen
             view.displaysurface.blit(surf, rect)
+            
+            # Debug shapes
+            if(view.debug):
+                # rough collision circle
+                collision_color = (168, 81, 245) # light purple
+                pygame.draw.circle(view.displaysurface, collision_color,
+                                       self.r,
+                                       0.5*self.collisionSize, 2)
         
 
     def register(self, brane: Brane):

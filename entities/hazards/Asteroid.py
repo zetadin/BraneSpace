@@ -23,7 +23,7 @@ class Asteroid(Structure):
         # create/load image
         self.img = assetFactory.loadImg("entities/hazards/rock.png", True)
         self.size = 32 # px
-        self.collisionSize = 0.75*self.size
+        self.collisionSize = 0.9*self.size
         
         # physics properties
         self.mass = 1.0e4

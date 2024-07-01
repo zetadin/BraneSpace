@@ -20,6 +20,7 @@ class Player(SpriteEntity):
         super().__init__()
         self.img = assetFactory.loadImg("entities/player/rocket.png", True)
         self.size = 64 # px
+        self.collisionSize=self.size # px
         
         # physics properties
         self.mass = 5.0e3
@@ -32,6 +33,7 @@ class Player(SpriteEntity):
         self.tractorActive = True
         self.collect_radius = 10.
         self.collect_radius_sq = self.collect_radius*self.collect_radius
+        self.collector_offset = 20.
         
         self.score = 0
         
@@ -50,6 +52,12 @@ class Player(SpriteEntity):
         self.direction = np.array([np.sin(self.theta), -np.cos(self.theta)])
         self.collector_r = self.r + self.collect_radius*self.direction
         self.collector_v = np.zeros(2)
+        
+        # collidable parts
+        self.collidables_rel_positions = np.array([
+                [0,-20],[0, 0], [-10,21],[10,21]
+                ]) # x,y pairs
+        self.collidables_sizes = [10, 15, 12, 12]
         
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
@@ -95,7 +103,7 @@ class Player(SpriteEntity):
         
         
         # collector motion
-        collector_newr = self.r + self.collect_radius*self.direction
+        collector_newr = self.r + self.collector_offset*self.direction
         self.collector_v = (collector_newr - self.collector_r)/dt
         self.collector_r = collector_newr
         
@@ -105,7 +113,20 @@ class Player(SpriteEntity):
         """
         super().draw(view)
         
-#        # Debug shapes
+        # Debug shapes
+        if(view.debug):            
+            # detailed collision circles
+            rot_matrix = np.array([
+                    [np.cos(self.theta),   np.sin(self.theta)],
+                    [-np.sin(self.theta),  np.cos(self.theta)]])    
+            screen_positions = self.r + np.matmul(self.collidables_rel_positions, rot_matrix)
+            collision_color = (74, 184, 212) # light blue
+            for i in range(len(self.collidables_sizes)):
+                pygame.draw.circle(view.displaysurface, collision_color,
+                                   screen_positions[i],
+                                   self.collidables_sizes[i], 2)
+            
+        
 #        # collector zone
 #        pygame.draw.circle(view.displaysurface, (0,0,255),
 #                           (self.collector_r[0],
