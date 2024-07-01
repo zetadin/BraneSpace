@@ -15,6 +15,7 @@ from entities.hazards.Asteroid import Asteroid
 from entities.Player import Player
 from Universe import updatables, drawables, collectables, universe
 from UI.TopBar import TopBar
+from utils.AssetFactory import assetFactory
 import time
 
 
@@ -26,6 +27,9 @@ tb = TopBar(view)
 # init game_over msg
 game_over_font = pygame.font.SysFont('liberationserif', 64)
 game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
+
+# load assets
+assetFactory.preloadAll()
 
 # init objects in universe
 cur_brane = Brane()

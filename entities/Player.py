@@ -12,12 +12,13 @@ from pygame.locals import *
 from entities.Entity import SpriteEntity
 from wavelets.Tractor import Tractor
 from View import HEIGHT, WIDTH
+from utils.AssetFactory import assetFactory
 
 
 class Player(SpriteEntity):
     def __init__(self):
         super().__init__()
-        self.img = pygame.image.load("assets/entities/player/rocket.png").convert_alpha()
+        self.img = assetFactory.load_img("entities/player/rocket.png", True)
         self.size = 64 # px
         
         # physics properties
