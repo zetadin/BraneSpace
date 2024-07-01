@@ -35,7 +35,7 @@ class Asteroid(Structure):
         #rotation
         self.theta -= dt*self.rot_vel
 
-    def collided_with(self, other):
+    def collidedWith(self, other):
         """Handle collisions.
         Asteroid gets destroyed and spawns some dark matter.
         """
@@ -49,7 +49,7 @@ class Asteroid(Structure):
         # request destruction, delayed until end of update
         universe.destroy_these_structures.append(self)
         
-    def collided_w_player(self):
+    def collidedWPlayer(self):
         """Handle collision with player.
         Player crashed."""
         universe.game_over = True

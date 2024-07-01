@@ -129,10 +129,10 @@ while True:
                 entity.update(update_dt)
                 
             # structure-structure collisions
-            universe.collision_detect(update_dt)
+            universe.collisionDetect(update_dt)
                 
             # structure-player collision
-            universe.collision_detect_w_player(player, update_dt)
+            universe.collisionDetectWPlayer(player, update_dt)
             
                 
             # attepmpt picking up collectables

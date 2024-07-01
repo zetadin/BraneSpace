@@ -31,7 +31,7 @@ class Universe():
             pass
         
         
-    def destroy_requested(self):
+    def destroyRequested(self):
         """
         Destroy entities after the update step.
         Needs to be after update to avoid iterating through a missing entity.
@@ -41,7 +41,7 @@ class Universe():
         self.destroy_these_structures=[]
         
         
-    def collision_detect(self, dt):
+    def collisionDetect(self, dt):
         # check for structure-structure collisions
         for i in range(len(self.structures)-1):
             si = self.structures[i]
@@ -49,17 +49,17 @@ class Universe():
                 sj = self.structures[j]
                 if(si.checkCollision(sj, dt)):
                     print(f"Structure collision: {i} & {j}")
-                    si.collided_with(sj)
-                    sj.collided_with(si)
+                    si.collidedWith(sj)
+                    sj.collidedWith(si)
                     break
                     
-        self.destroy_requested()
+        self.destroyRequested()
             
         
-    def collision_detect_w_player(self, player, dt):
+    def collisionDetectWPlayer(self, player, dt):
         for si in self.structures:
             if(si.checkCollision(player, dt)):
-                si.collided_w_player()
+                si.collidedWPlayer()
             
         
             

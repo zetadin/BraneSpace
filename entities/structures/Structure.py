@@ -22,11 +22,11 @@ class Structure(SpriteEntity):
         super().register(brane)
         structures.append(self)
         
-    def collided_with(self, other):
+    def collidedWith(self, other):
         """Handle collisions."""
         pass;
         
-    def collided_w_player(self):
+    def collidedWPlayer(self):
         """Handle collision with player."""
         pass;
     
