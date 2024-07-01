@@ -48,3 +48,7 @@ class Asteroid(Structure):
         # request destruction, delayed until end of update
         universe.destroy_these_structures.append(self)
         
+    def collided_w_player(self):
+        """Handle collision with player.
+        Player crashed."""
+        universe.game_over = True

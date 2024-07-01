@@ -25,6 +25,10 @@ class Structure(SpriteEntity):
     def collided_with(self, other):
         """Handle collisions."""
         pass;
+        
+    def collided_w_player(self):
+        """Handle collision with player."""
+        pass;
     
     def destroy(self):
         if self in structures: structures.remove(self)

@@ -23,27 +23,35 @@ view = View()
 # init UI
 tb = TopBar(view)
 
-        
+# init game_over msg
+game_over_font = pygame.font.SysFont('liberationserif', 64)
+game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
+
 # init objects in universe
 cur_brane = Brane()
 cur_brane.register()
 
+player = Player()
+player.register(cur_brane)
+tb.bindPlayer(player)
+
+selfdot = lambda x : np.dot(x,x)
 for i in range(20):
     loot = DarkMatter()
     loot.r = np.random.random(2)*WIDTH
+    while(selfdot(loot.r-player.r) < player.size*player.size):
+        loot.r = np.random.random(2)*WIDTH
     loot.v = (np.random.random(2) - 0.5)*0.05
     loot.register(cur_brane)
     
 for i in range(20):
     roid = Asteroid()
     roid.r = np.random.random(2)*WIDTH*0.8 + 0.1*WIDTH
+    while(selfdot(roid.r-player.r) < player.size*player.size):
+        roid.r = np.random.random(2)*WIDTH
     roid.v = (np.random.random(2) - 0.5)*0.01
     roid.register(cur_brane)
-    
 
-player = Player()
-player.register(cur_brane)
-tb.bindPlayer(player)
 
 #portal = Portal()
 #portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
@@ -61,7 +69,6 @@ maxUpdatesPerFrame = 1  # increase to this many if fast enough
 update_dt = dt/updatesPerFrame
 
 
-first_frame=True
 
 # game loop
 while True:
@@ -107,34 +114,33 @@ while True:
                 
             
             
-            
-            
     update_ms_left = min(dt, 1000./FPS)*0.8
     update_ms = 1000
-    for u in range(updatesPerFrame):
-        startTime = time.time()
-        
-        # update objects
-        for entity in updatables:
-            entity.update(update_dt)
+    if(not universe.game_over):
+        for u in range(updatesPerFrame):
+            startTime = time.time()
             
-        # structure-structure collisions
-        if(first_frame):
-            first_frame = False
-        else:
-            universe.update(update_dt)
+            # update objects
+            for entity in updatables:
+                entity.update(update_dt)
+                
+            # structure-structure collisions
+            universe.collision_detect(update_dt)
+                
+            # structure-player collision
+            universe.collision_detect_w_player(player, update_dt)
             
-        # attepmpt picking up collectables
-        player.attemptPickUp(collectables, view, update_dt)
-        
-        update_ms = (time.time()-startTime)*1000.
-        update_ms_left -= update_ms
-        # remainingUpdates = updatesPerFrame - 1 - u
-        if(update_ms_left < update_ms and u+1!=updatesPerFrame):
-            # not enough time for another update,
-            # and this is not the last scheduled one
-            break
+                
+            # attepmpt picking up collectables
+            player.attemptPickUp(collectables, view, update_dt)
             
+            update_ms = (time.time()-startTime)*1000.
+            update_ms_left -= update_ms
+            # remainingUpdates = updatesPerFrame - 1 - u
+            if(update_ms_left < update_ms and u+1!=updatesPerFrame):
+                # not enough time for another update,
+                # and this is not the last scheduled one
+                break
     
     
      
@@ -148,6 +154,13 @@ while True:
         
     # draw the UI
     tb.draw(view)
+    
+    # draw Game Over
+    if(universe.game_over):
+        screenWidth, screenHeight = view.displaysurface.get_size()
+        msgWidth, msgHeight = game_over_surf.get_size()
+        view.displaysurface.blit(game_over_surf,(0.5*(screenWidth-msgWidth),
+                                                 0.5*(screenHeight-msgHeight)))
  
     # push to frame buffer
     pygame.display.update()

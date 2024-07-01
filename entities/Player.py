@@ -24,7 +24,7 @@ class Player(SpriteEntity):
         self.mass = 5.0e3
         self.dragCoef = 0.02
         # coordinates in world space
-        self.r = np.array([WIDTH/3, WIDTH/3])
+        self.r = np.array([WIDTH/2, WIDTH/2])
         self.theta = 0 #np.pi*0.5
         
         self.tractorElapsed = 0.0

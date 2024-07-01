@@ -15,6 +15,8 @@ class Universe():
         self.simsize = simsize
         self.parallel = parallel
         
+        self.game_over = False
+        
         self.drawables = pygame.sprite.Group()
         self.updatables=[]
         self.collectables=[]
@@ -39,7 +41,7 @@ class Universe():
         self.destroy_these_structures=[]
         
         
-    def update(self, dt):
+    def collision_detect(self, dt):
         # check for structure-structure collisions
         for i in range(len(self.structures)-1):
             si = self.structures[i]
@@ -53,6 +55,13 @@ class Universe():
                     
         self.destroy_requested()
             
+        
+    def collision_detect_w_player(self, player, dt):
+        for si in self.structures:
+            if(si.checkCollision(player, dt)):
+                si.collided_w_player()
+            
+        
             
 universe = Universe(128, parallel=False)
 SIM_SIZE = universe.simsize
