@@ -20,6 +20,7 @@ import time
 from entities.hazards.Explosion import Explosion
 
 
+universe.reset()
 view = View()
 
 # init UI

@@ -15,14 +15,12 @@ class Universe():
         self.simsize = simsize
         self.parallel = parallel
         
-        self.game_over = False
-        
         self.drawables = pygame.sprite.Group()
         self.updatables=[]
         self.collectables=[]
         self.structures=[]
         
-        self.destroy_these_structures=[]
+        self.reset()
         
         # if we use multiple cores, create a shared memory
         # to hold entity positions and velocities
@@ -30,6 +28,17 @@ class Universe():
         if(self.parallel):
             pass
         
+    def reset(self):
+        """
+        Call when game (re)starts.
+        """
+        self.game_over = False
+        
+        self.drawables.empty()
+        self.updatables.clear()
+        self.collectables.clear()
+        self.structures.clear()
+        self.destroy_these_structures=[]
         
     def destroyRequested(self):
         """
