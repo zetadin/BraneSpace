@@ -11,13 +11,14 @@ import numpy.typing as npt
 import pygame
 from pygame.locals import *
 from View import View
+from utils.AssetFactory import assetFactory
 
 
 class TopBar(pygame.sprite.Sprite):
     def __init__(self, view: View):
-        self.bkgImg = pygame.image.load("assets/UI/RustedMetal.png").convert()
-        self.border = pygame.image.load("assets/UI/Toolbar_edge_128.png").convert()
-        self.darkMatterImg = pygame.image.load("assets/entities/resources/dark_matter.png").convert_alpha()
+        self.bkgImg = assetFactory.load_img("UI/RustedMetal.png", False)
+        self.border = assetFactory.load_img("UI/Toolbar_edge_128.png", False)
+        self.darkMatterImg = assetFactory.load_img("entities/resources/dark_matter.png", True)
         fillWColor(self.darkMatterImg,
                     np.array([200,200,200], dtype=np.uint8)
                    )

@@ -12,13 +12,14 @@ from pygame.locals import *
 from entities.structures.Structure import Structure
 from entities.resources.Resources import DarkMatter
 from Universe import universe
+from utils.AssetFactory import assetFactory
 
 class Asteroid(Structure):
     def __init__(self):
         super().__init__()
         
         # create/load image
-        self.img = pygame.image.load("assets/entities/hazards/rock.png").convert_alpha()
+        self.img = assetFactory.load_img("entities/hazards/rock.png", True)
         self.size = 32 # px
         
         # physics properties

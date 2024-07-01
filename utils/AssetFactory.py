@@ -21,8 +21,8 @@ class AssetFactory():
          """
          
          #images
-         img_files = glob.glob(self.assets_path+"/**.png", recursive=True)
-         print(img_files)
+         img_files = glob.glob(os.path.join(self.assets_path,"**","*.png"),
+                               recursive=True)
          pbar = tqdm.tqdm(img_files)
          pbar.set_description("Loading Images")
          for f in pbar:
@@ -36,11 +36,20 @@ class AssetFactory():
              return(self.preloaded_imgs[key])
          
          # load it otherwise
-         img = pygame.image.load(os.path.join(self.assets_path, file))
-         if(use_alpha):
-                 img = img.convert_alpha()
+         # convert path depending on the os
+         if(os.name == 'nt'): # windows
+             fp = os.path.join(self.assets_path, file).replace('/', '\\')
+         else: # posix, java
+             fp = os.path.join(self.assets_path, file).replace('\\','/')
+         img = pygame.image.load(fp)
+         
+         if(use_alpha): # need transparency?
+             img = img.convert_alpha()
+         else:
+             img = img.convert()
          # store preloaded
          self.preloaded_imgs[key]=img
+         
          return(img)
          
 # exported objects:

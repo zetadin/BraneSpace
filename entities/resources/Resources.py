@@ -11,7 +11,7 @@ import numpy.typing as npt
 import pygame
 from entities.Entity import SpriteEntity
 from Universe import updatables, drawables, collectables
-
+from utils.AssetFactory import assetFactory
 
 class Collectable(SpriteEntity):
     """
@@ -76,7 +76,7 @@ class DarkMatter(Collectable):
         super().__init__()
         
         # create/load image
-        self.img = pygame.image.load("assets/entities/resources/dark_matter.png").convert_alpha()
+        self.img = assetFactory.load_img("entities/resources/dark_matter.png", True)
         self.size = 16 # px
         
         # physics properties

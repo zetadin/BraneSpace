@@ -10,13 +10,15 @@ import numpy as np
 import pygame
 from pygame.locals import *
 from entities.structures.Structure import Structure
+from utils.AssetFactory import assetFactory
 
 class Portal(Structure):
     def __init__(self):
         super().__init__()
         
         # create/load image
-        self.img = pygame.image.load("assets/entities/structures/portal.png").convert_alpha()
+        
+        self.img = assetFactory.load_img("entities/structures/portal.png", True)
         self.size = 128 # px
         
         # physics properties
