@@ -17,6 +17,7 @@ from Universe import updatables, drawables, collectables, universe
 from UI.TopBar import TopBar
 from utils.AssetFactory import assetFactory
 import time
+from entities.hazards.Explosion import Explosion
 
 
 view = View()
@@ -56,6 +57,10 @@ for i in range(20):
     roid.v = (np.random.random(2) - 0.5)*0.01
     roid.register(cur_brane)
 
+
+#expl = Explosion()
+#expl.r = np.array([0.25*WIDTH,0.25*HEIGHT])
+#expl.register(cur_brane)
 
 #portal = Portal()
 #portal.r = np.array([WIDTH*0.7, WIDTH*0.7])

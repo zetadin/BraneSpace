@@ -48,7 +48,6 @@ class Universe():
             for j in range(i+1, len(self.structures)):
                 sj = self.structures[j]
                 if(si.checkCollision(sj, dt)):
-                    print(f"Structure collision: {i} & {j}")
                     si.collidedWith(sj)
                     sj.collidedWith(si)
                     break

@@ -58,5 +58,8 @@ class AssetFactory():
      def isLoadedImg(self, key):
          return(key in self.preloaded_imgs.keys())
          
+     def loadProceduralImg(self, key: str):
+         return(self.preloaded_imgs[key])
+         
 # exported objects:
 assetFactory = AssetFactory()

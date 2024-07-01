@@ -13,6 +13,8 @@ from entities.structures.Structure import Structure
 from entities.resources.Resources import DarkMatter
 from Universe import universe
 from utils.AssetFactory import assetFactory
+from entities.hazards.Explosion import Explosion
+
 
 class Asteroid(Structure):
     def __init__(self):
@@ -21,6 +23,7 @@ class Asteroid(Structure):
         # create/load image
         self.img = assetFactory.loadImg("entities/hazards/rock.png", True)
         self.size = 32 # px
+        self.collisionSize = 0.75*self.size
         
         # physics properties
         self.mass = 1.0e4
@@ -43,8 +46,13 @@ class Asteroid(Structure):
         for i in range(np.random.randint(1,3)):
             loot = DarkMatter()
             loot.r = self.r
-            loot.v = COM_v + (np.random.random(2) - 0.5)*0.05
+            loot.v = COM_v + (np.random.random(2) - 0.5)*0.1
             loot.register(self.parentBrane)
+            
+        expl = Explosion()
+        expl.r = self.r
+        expl.v = self.v
+        expl.register(self.parentBrane)
             
         # request destruction, delayed until end of update
         universe.destroy_these_structures.append(self)

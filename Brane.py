@@ -99,7 +99,7 @@ class Brane(pygame.sprite.Sprite):
             # Copy the rgb part of array to the new surface.
             pygame.pixelcopy.array_to_surface(grad_surf, grad_colors)
     
-            # overwtite grad_surf's alpha
+            # overwrite grad_surf's alpha
             gsa = np.array(grad_surf.get_view('A'), copy=False)
             gsa[:,:] = grad_alpha
             del gsa # to unlock grad_surf to allow blit 

@@ -74,6 +74,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                 width=2, border_radius = 3)
         
         self.size = 16
+        self.collisionSize = 1*self.size
         
         self.theta = 0.0 # direction in radians from North (Up)
         
@@ -117,7 +118,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         ce  = other.r - self.r    # end to center
                 
         # end points in radius
-        collision_radius = 0.5*(self.size+other.size)
+        collision_radius = 0.5*(self.collisionSize+other.collisionSize)
         collision_radius_sq = collision_radius*collision_radius
         if(np.dot(cx,cx)<=collision_radius_sq):
             collided = True

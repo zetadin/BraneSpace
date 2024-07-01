@@ -20,7 +20,7 @@ class TopBar(pygame.sprite.Sprite):
         self.border = assetFactory.loadImg("UI/Toolbar_edge_128.png", False)
         
         if(assetFactory.isLoadedImg("dark_matter__grey")):
-            self.darkMatterImg = assetFactory.loadImg("dark_matter__grey")
+            self.darkMatterImg = assetFactory.loadProceduralImg("dark_matter__grey")
         else:
             self.darkMatterImg = assetFactory.loadImg("entities/resources/dark_matter.png", True)
             self.darkMatterImg = self.darkMatterImg.copy()
