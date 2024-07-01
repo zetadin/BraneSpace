@@ -18,7 +18,7 @@ class Portal(Structure):
         
         # create/load image
         
-        self.img = assetFactory.load_img("entities/structures/portal.png", True)
+        self.img = assetFactory.loadImg("entities/structures/portal.png", True)
         self.size = 128 # px
         
         # physics properties

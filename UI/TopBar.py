@@ -16,12 +16,18 @@ from utils.AssetFactory import assetFactory
 
 class TopBar(pygame.sprite.Sprite):
     def __init__(self, view: View):
-        self.bkgImg = assetFactory.load_img("UI/RustedMetal.png", False)
-        self.border = assetFactory.load_img("UI/Toolbar_edge_128.png", False)
-        self.darkMatterImg = assetFactory.load_img("entities/resources/dark_matter.png", True)
-        fillWColor(self.darkMatterImg,
-                    np.array([200,200,200], dtype=np.uint8)
-                   )
+        self.bkgImg = assetFactory.loadImg("UI/RustedMetal.png", False)
+        self.border = assetFactory.loadImg("UI/Toolbar_edge_128.png", False)
+        
+        if(assetFactory.isLoadedImg("dark_matter__grey")):
+            self.darkMatterImg = assetFactory.loadImg("dark_matter__grey")
+        else:
+            self.darkMatterImg = assetFactory.loadImg("entities/resources/dark_matter.png", True)
+            self.darkMatterImg = self.darkMatterImg.copy()
+            fillWColor(self.darkMatterImg,
+                        np.array([200,200,200], dtype=np.uint8)
+                       )
+            assetFactory.registerProceduralImg("dark_matter__grey", self.darkMatterImg)
         
         self.player = None
         

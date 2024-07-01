@@ -26,9 +26,9 @@ class AssetFactory():
          pbar = tqdm.tqdm(img_files)
          pbar.set_description("Loading Images")
          for f in pbar:
-             _=self.load_img(f, True)
+             _=self.loadImg(f, True)
          
-     def load_img(self, file: str, use_alpha: bool=True):
+     def loadImg(self, file: str, use_alpha: bool=True):
          key=file+"__use_alpha="+str(use_alpha)
          
          # return preloaded if possible
@@ -51,6 +51,12 @@ class AssetFactory():
          self.preloaded_imgs[key]=img
          
          return(img)
+         
+     def registerProceduralImg(self, key, img):
+         self.preloaded_imgs[key]=img
+         
+     def isLoadedImg(self, key):
+         return(key in self.preloaded_imgs.keys())
          
 # exported objects:
 assetFactory = AssetFactory()

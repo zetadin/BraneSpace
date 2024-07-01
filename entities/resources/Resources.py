@@ -76,7 +76,7 @@ class DarkMatter(Collectable):
         super().__init__()
         
         # create/load image
-        self.img = assetFactory.load_img("entities/resources/dark_matter.png", True)
+        self.img = assetFactory.loadImg("entities/resources/dark_matter.png", True)
         self.size = 16 # px
         
         # physics properties

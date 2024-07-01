@@ -19,7 +19,7 @@ class Asteroid(Structure):
         super().__init__()
         
         # create/load image
-        self.img = assetFactory.load_img("entities/hazards/rock.png", True)
+        self.img = assetFactory.loadImg("entities/hazards/rock.png", True)
         self.size = 32 # px
         
         # physics properties

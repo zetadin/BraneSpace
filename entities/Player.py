@@ -18,7 +18,7 @@ from utils.AssetFactory import assetFactory
 class Player(SpriteEntity):
     def __init__(self):
         super().__init__()
-        self.img = assetFactory.load_img("entities/player/rocket.png", True)
+        self.img = assetFactory.loadImg("entities/player/rocket.png", True)
         self.size = 64 # px
         
         # physics properties
