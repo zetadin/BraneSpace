@@ -20,7 +20,7 @@ class Player(SpriteEntity):
         super().__init__()
         self.img = assetFactory.loadImg("entities/player/rocket.png", True)
         self.size = 64 # px
-        self.collisionSize=self.size # px
+        self.collisionSize=self.size*1.1 # px
         
         # physics properties
         self.mass = 5.0e3
@@ -55,7 +55,7 @@ class Player(SpriteEntity):
         
         # collidable parts
         self.collidables_rel_positions = np.array([
-                [0,-20],[0, 0], [-10,21],[10,21]
+                [0,-22],[0, 0], [-10,20],[10,20]
                 ]) # x,y pairs
         self.collidables_sizes = [10, 15, 12, 12]
         
