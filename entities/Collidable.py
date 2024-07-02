@@ -21,11 +21,11 @@ class Collidable(SpriteEntity):
         """Handle collisions."""
         pass;
         
-#    def collidedWPlayer(self):
-#        """Handle collision with player."""
-#        pass;
-    
     def destroy(self):
+        """
+        Every collidable should request it's own eventual
+        destruction by this function.
+        """
         if self in collidables: collidables.remove(self)
         if self in updatables: updatables.remove(self)
         if self in drawables: drawables.remove(self)

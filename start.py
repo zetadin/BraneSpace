@@ -17,7 +17,6 @@ from Universe import updatables, drawables, collectables, universe
 from UI.TopBar import TopBar
 from utils.AssetFactory import assetFactory
 import time
-from entities.hazards.Explosion import Explosion
 
 
 universe.reset()
@@ -60,17 +59,11 @@ for i in range(20):
     roid.register(cur_brane)
 
 
-#expl = Explosion()
-#expl.r = np.array([0.25*WIDTH,0.25*HEIGHT])
-#expl.register(cur_brane)
 
 #portal = Portal()
 #portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
 #portal.register(cur_brane)
-#
-#filler = SpriteEntity()
-#filler.r = np.array([115.,215.])
-#filler.register(cur_brane)
+
 
 # initial guess at frame time
 dt = 1000./FPS
@@ -137,10 +130,6 @@ while True:
                 
             # collisions between collidables (including player)
             universe.collisionDetect(update_dt)
-                
-#            # structure-player collision
-#            universe.collisionDetectWPlayer(player, update_dt)
-            
                 
             # attepmpt picking up collectables
             player.attemptPickUp(collectables, view, update_dt)

@@ -38,16 +38,16 @@ class Universe():
         self.updatables.clear()
         self.collectables.clear()
         self.collidables.clear()
-        self.destroy_these_structures=[]
+        self.destroy_these_collidables=[]
         
     def destroyRequested(self):
         """
         Destroy entities after the update step.
         Needs to be after update to avoid iterating through a missing entity.
         """
-        for e in self.destroy_these_structures:
+        for e in self.destroy_these_collidables:
             e.destroy()
-        self.destroy_these_structures=[]
+        self.destroy_these_collidables=[]
         
         
     def collisionDetect(self, dt):
@@ -62,12 +62,6 @@ class Universe():
                     break
                     
         self.destroyRequested()
-            
-        
-#    def collisionDetectWPlayer(self, player, dt):
-#        for si in self.structures:
-#            if(si.checkCollision(player, dt)):
-#                si.collidedWPlayer()
             
         
             

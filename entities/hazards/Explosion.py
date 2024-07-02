@@ -49,6 +49,7 @@ class Explosion(Collidable):
         # lifetime
         self.curLifeTime += dt
         if(self.curLifeTime > self.maxLifeTime):
+            # safe to destroy here: we are outside universe.collisionDetect()
             self.destroy()
         else:
             # update size
@@ -60,9 +61,3 @@ class Explosion(Collidable):
             img_a = np.array(self.img.get_view('A'), copy=False)
             img_a[img_a>0] = 180*(1.0 - factor)
             del img_a # to unlock img and allow blit
-
-
-#    def collidedWPlayer(self):
-#        """Handle collision with player.
-#        Player crashed."""
-#        universe.game_over = True

@@ -55,9 +55,4 @@ class Asteroid(Collidable):
         expl.register(self.parentBrane)
             
         # request destruction, delayed until end of update
-        universe.destroy_these_structures.append(self)
-        
-#    def collidedWPlayer(self):
-#        """Handle collision with player.
-#        Player crashed."""
-#        universe.game_over = True
+        universe.destroy_these_collidables.append(self)
