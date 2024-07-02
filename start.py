@@ -30,6 +30,11 @@ tb = TopBar(view)
 game_over_font = pygame.font.SysFont('liberationserif', 64)
 game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
 
+# init paused msg
+pause_font = pygame.font.SysFont('liberationserif', 42)
+pause_surf = pause_font.render("Press <RETURN> to Play",
+                                   True, (219,188,86))
+
 # load assets
 assetFactory.preloadAll()
 
@@ -71,6 +76,7 @@ dt = 1000./FPS
 updatesPerFrame = 1     # start with 1
 maxUpdatesPerFrame = 1  # increase to this many if fast enough
 update_dt = dt/updatesPerFrame
+
 
 
 
@@ -116,11 +122,15 @@ while True:
             elif event.key == pygame.K_ESCAPE:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
+            # quit
+            elif event.key == pygame.K_RETURN:
+                universe.paused = not universe.paused
+                
             
     # run the force calculation, position updates, and collision detection
     update_ms_left = min(dt, 1000./FPS)*0.8
     update_ms = 1000
-    if(not universe.game_over):
+    if(not universe.game_over and not universe.paused):
         for u in range(updatesPerFrame):
             startTime = time.time()
             
@@ -161,6 +171,14 @@ while True:
         msgWidth, msgHeight = game_over_surf.get_size()
         view.displaysurface.blit(game_over_surf,(0.5*(screenWidth-msgWidth),
                                                  0.5*(screenHeight-msgHeight)))
+    # draw pause
+    if(universe.paused):
+        screenWidth, screenHeight = view.displaysurface.get_size()
+        msgWidth, msgHeight = pause_surf.get_size()
+        view.displaysurface.blit(pause_surf,(0.5*(screenWidth-msgWidth),
+                                             0.5*(screenHeight-msgHeight)))
+    
+    
  
     # push to frame buffer
     pygame.display.update()

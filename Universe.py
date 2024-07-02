@@ -33,6 +33,7 @@ class Universe():
         Call when game (re)starts.
         """
         self.game_over = False
+        self.paused = True
         
         self.drawables.empty()
         self.updatables.clear()
