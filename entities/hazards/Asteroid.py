@@ -9,14 +9,14 @@ Created on Fri May 10 15:01:10 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.structures.Structure import Structure
+from entities.Collidable import Collidable
 from entities.resources.Resources import DarkMatter
 from Universe import universe
 from utils.AssetFactory import assetFactory
 from entities.hazards.Explosion import Explosion
 
 
-class Asteroid(Structure):
+class Asteroid(Collidable):
     def __init__(self):
         super().__init__()
         
@@ -57,7 +57,7 @@ class Asteroid(Structure):
         # request destruction, delayed until end of update
         universe.destroy_these_structures.append(self)
         
-    def collidedWPlayer(self):
-        """Handle collision with player.
-        Player crashed."""
-        universe.game_over = True
+#    def collidedWPlayer(self):
+#        """Handle collision with player.
+#        Player crashed."""
+#        universe.game_over = True

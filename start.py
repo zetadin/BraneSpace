@@ -124,7 +124,7 @@ while True:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
             
-            
+    # run the force calculation, position updates, and collision detection
     update_ms_left = min(dt, 1000./FPS)*0.8
     update_ms = 1000
     if(not universe.game_over):
@@ -135,11 +135,11 @@ while True:
             for entity in updatables:
                 entity.update(update_dt)
                 
-            # structure-structure collisions
+            # collisions between collidables (including player)
             universe.collisionDetect(update_dt)
                 
-            # structure-player collision
-            universe.collisionDetectWPlayer(player, update_dt)
+#            # structure-player collision
+#            universe.collisionDetectWPlayer(player, update_dt)
             
                 
             # attepmpt picking up collectables

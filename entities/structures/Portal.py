@@ -9,10 +9,10 @@ Created on Fri May 10 15:01:10 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.structures.Structure import Structure
+from entities.Collidable import Collidable
 from utils.AssetFactory import assetFactory
 
-class Portal(Structure):
+class Portal(Collidable):
     def __init__(self):
         super().__init__()
         

@@ -9,13 +9,13 @@ Created on Mon Jul  1 14:23:17 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.structures.Structure import Structure
+from entities.Collidable import Collidable
 from entities.resources.Resources import DarkMatter
 from Universe import universe
 from utils.AssetFactory import assetFactory
 
 
-class Explosion(Structure):
+class Explosion(Collidable):
     def __init__(self):
         super().__init__()
         
@@ -62,7 +62,7 @@ class Explosion(Structure):
             del img_a # to unlock img and allow blit
 
 
-    def collidedWPlayer(self):
-        """Handle collision with player.
-        Player crashed."""
-        universe.game_over = True
+#    def collidedWPlayer(self):
+#        """Handle collision with player.
+#        Player crashed."""
+#        universe.game_over = True

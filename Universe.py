@@ -18,7 +18,7 @@ class Universe():
         self.drawables = pygame.sprite.Group()
         self.updatables=[]
         self.collectables=[]
-        self.structures=[]
+        self.collidables=[]
         
         self.reset()
         
@@ -37,7 +37,7 @@ class Universe():
         self.drawables.empty()
         self.updatables.clear()
         self.collectables.clear()
-        self.structures.clear()
+        self.collidables.clear()
         self.destroy_these_structures=[]
         
     def destroyRequested(self):
@@ -52,10 +52,10 @@ class Universe():
         
     def collisionDetect(self, dt):
         # check for structure-structure collisions
-        for i in range(len(self.structures)-1):
-            si = self.structures[i]
-            for j in range(i+1, len(self.structures)):
-                sj = self.structures[j]
+        for i in range(len(self.collidables)-1):
+            si = self.collidables[i]
+            for j in range(i+1, len(self.collidables)):
+                sj = self.collidables[j]
                 if(si.checkCollision(sj, dt)):
                     si.collidedWith(sj)
                     sj.collidedWith(si)
@@ -64,10 +64,10 @@ class Universe():
         self.destroyRequested()
             
         
-    def collisionDetectWPlayer(self, player, dt):
-        for si in self.structures:
-            if(si.checkCollision(player, dt)):
-                si.collidedWPlayer()
+#    def collisionDetectWPlayer(self, player, dt):
+#        for si in self.structures:
+#            if(si.checkCollision(player, dt)):
+#                si.collidedWPlayer()
             
         
             
@@ -78,4 +78,4 @@ SIM_SIZE = universe.simsize
 drawables = universe.drawables
 updatables = universe.updatables
 collectables = universe.collectables
-structures = universe.structures
+collidables = universe.collidables

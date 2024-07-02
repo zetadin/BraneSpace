@@ -9,13 +9,14 @@ Created on Fri May 10 15:07:40 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.Entity import SpriteEntity
+from entities.Collidable import Collidable
 from wavelets.Tractor import Tractor
 from View import HEIGHT, WIDTH
+from Universe import universe
 from utils.AssetFactory import assetFactory
 
 
-class Player(SpriteEntity):
+class Player(Collidable):
     def __init__(self):
         super().__init__()
         self.img = assetFactory.loadImg("entities/player/rocket.png", True)
@@ -161,6 +162,23 @@ class Player(SpriteEntity):
             self.collector_v = self.v
             for e in collectables:
                 e.attemptPickUp(self, view, dt)
+        
+        
+    def collidedWith(self, other):
+        """Handle collisions."""
+        
+        # what type of collidable did we run into?
+        other_type = str(type(other))[2:-2].split('.')[-1]
+        
+        # Is it dangerous?
+        if(other_type in ["Asteroid", "Explosion"]):
+            # then game over
+            universe.game_over = True
+            
+        # TODO: otherwize do a perfect eleastic collision
+        # but only if both objects are still ok.
+        # Return True here and do elastic collision
+        # in Universe class if both objects return true
         
         
             
