@@ -17,13 +17,13 @@ from entities.hazards.Explosion import Explosion
 
 
 class Asteroid(Collidable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         # create/load image
         self.img = assetFactory.loadImg("entities/hazards/rock.png", True)
         self.size = 32 # px
-        self.collisionSize = 1.0*self.size
+        self.collisionRadius = 0.5*self.size
         
         # physics properties
         self.mass = 1.0e4
@@ -32,11 +32,6 @@ class Asteroid(Collidable):
         self.rot_vel = np.random.uniform(-0.5, 0.5)*np.pi/1000 # +-90 deg/s
         self.theta = np.random.uniform(-1, 1)*np.pi
         
-    def update(self, dt: float):
-        super().update(dt)
-        
-        #rotation
-        self.theta -= dt*self.rot_vel
 
     def collidedWith(self, other):
         """Handle collisions.

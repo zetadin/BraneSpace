@@ -67,16 +67,23 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         super().__init__(mass, drag)
         
         # create a temp image that will be overriden
-        self.img = pygame.Surface((16,16), flags=pygame.SRCALPHA)
-        pygame.draw.rect(
-                surface=self.img, color=(255, 0, 0, 255),
-                rect=self.img.get_rect(),
-                width=2, border_radius = 3)
+        self.img = None
+#        self.img = pygame.Surface((16,16), flags=pygame.SRCALPHA)
+#        pygame.draw.rect(
+#                surface=self.img, color=(255, 0, 0, 255),
+#                rect=self.img.get_rect(),
+#                width=2, border_radius = 3)
         
         self.size = 16
-        self.collisionSize = 1*self.size
         
         self.theta = 0.0 # direction in radians from North (Up)
+        self.rot_vel = 0.0 # rotational velocity
+        
+        
+    def update(self, dt: float):
+        super().update(dt)
+        #rotation
+        self.theta -= dt*self.rot_vel
         
                 
     def draw(self, view):
@@ -85,62 +92,22 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         """
         # culling
         if(view.isOnScreen(self)):
-            # scale & rotate the image
-            zoom = float(self.size)*view.zoom/self.img.get_width()
-            surf = pygame.transform.rotozoom(
-                    self.img,
-                    -self.theta*180./np.pi, # in deg CCW of North (Up)
-                    zoom)
-            
-            # update position on screen
-            rect = surf.get_rect(center=view.transform(self.r))
-            
-            # draw to screen
-            view.displaysurface.blit(surf, rect)
-            
-            # Debug shapes
-            if(view.debug):
-                # rough collision circle
-                collision_color = (168, 81, 245) # light purple
-                pygame.draw.circle(view.displaysurface, collision_color,
-                                       self.r,
-                                       0.5*self.collisionSize, 2)
+            if(not self.img is None): # check if image surface was created
+                # scale & rotate the image
+                zoom = float(self.size)*view.zoom/self.img.get_width()
+                surf = pygame.transform.rotozoom(
+                        self.img,
+                        -self.theta*180./np.pi, # in deg CCW of North (Up)
+                        zoom)
+                
+                # update position on screen
+                rect = surf.get_rect(center=view.transform(self.r))
+                
+                # draw to screen
+                view.displaysurface.blit(surf, rect)
         
 
     def register(self, brane: Brane):
         """Add to the list of objects in the universe."""
         super().register(brane)
         drawables.add(self)
-        
-    def checkCollision(self, other: "SpriteEntity", dt):
-        collided = False
-            
-        # Are they close enough and moving fast enough to collide on each axis?
-        
-        
-        # line segment to circle collision
-        # stationary circle by changingeffective velocity of self
-        vdt = (self.v - other.v) * dt # start to end
-        x   = self.r - vdt                   # start pos
-        cx  = other.r - x         # start to center
-        ce  = other.r - self.r    # end to center
-                
-        # end points in radius
-        collision_radius = 0.5*(self.collisionSize+other.collisionSize)
-        collision_radius_sq = collision_radius*collision_radius
-        if(np.dot(cx,cx)<=collision_radius_sq):
-            collided = True
-        elif(np.dot(ce,ce)<=collision_radius_sq):
-            collided = True
-        # projection in segment?
-        else:
-            vdtsq = np.dot(vdt,vdt)
-            u = np.dot(cx, vdt)/vdtsq
-            if(u>=0.0 and u<=1.0):
-                # check distance to center
-                psq = u*u*vdtsq # (pos on start-end segment)^2
-                dsq = np.dot(cx, cx) - psq # closest distance to center ^2
-                if(dsq<=collision_radius_sq):
-                    collided = True
-    
-        return(collided)

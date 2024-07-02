@@ -9,19 +9,19 @@ Created on Fri May 10 15:07:40 2024
 import numpy as np
 import pygame
 from pygame.locals import *
-from entities.Collidable import Collidable
+from entities.Collidable import MultiPartCollidable
 from wavelets.Tractor import Tractor
 from View import HEIGHT, WIDTH
 from Universe import universe
 from utils.AssetFactory import assetFactory
 
 
-class Player(Collidable):
-    def __init__(self):
-        super().__init__()
+class Player(MultiPartCollidable):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.img = assetFactory.loadImg("entities/player/rocket.png", True)
         self.size = 64 # px
-        self.collisionSize=self.size*1.1 # px
+        self.collisionRadius = 0.5*self.size*1.1 # px
         
         # physics properties
         self.mass = 5.0e3
@@ -55,10 +55,10 @@ class Player(Collidable):
         self.collector_v = np.zeros(2)
         
         # collidable parts
-        self.collidables_rel_positions = np.array([
+        self.part_rel_positions = np.array([
                 [0,-22],[0, 0], [-10,20],[10,20]
                 ]) # x,y pairs
-        self.collidables_sizes = [10, 15, 12, 12]
+        self.part_radii = [10, 15, 12, 12]
         
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
@@ -116,16 +116,7 @@ class Player(Collidable):
         
         # Debug shapes
         if(view.debug):            
-            # detailed collision circles
-            rot_matrix = np.array([
-                    [np.cos(self.theta),   np.sin(self.theta)],
-                    [-np.sin(self.theta),  np.cos(self.theta)]])    
-            screen_positions = self.r + np.matmul(self.collidables_rel_positions, rot_matrix)
-            collision_color = (74, 184, 212) # light blue
-            for i in range(len(self.collidables_sizes)):
-                pygame.draw.circle(view.displaysurface, collision_color,
-                                   screen_positions[i],
-                                   self.collidables_sizes[i], 2)
+            pass
 
         
         

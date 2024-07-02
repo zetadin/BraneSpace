@@ -16,8 +16,8 @@ from utils.AssetFactory import assetFactory
 
 
 class Explosion(Collidable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         # create/load image
         self.img = assetFactory.loadImg("entities/hazards/explosion.png", True)
@@ -27,8 +27,8 @@ class Explosion(Collidable):
         self.minSize = 32
         self.maxSize = self.minSize*2
         
-        self.size = 32 # px
-        self.collisionSize = 0.4*self.size
+        self.size = self.minSize # px
+        self.collisionRadius = 0.25*self.size
         
         self.maxLifeTime = 1000 # ms
         self.curLifeTime = 0   # ms
@@ -43,9 +43,6 @@ class Explosion(Collidable):
     def update(self, dt: float):
         super().update(dt)
         
-        #rotation
-        self.theta -= dt*self.rot_vel
-        
         # lifetime
         self.curLifeTime += dt
         if(self.curLifeTime > self.maxLifeTime):
@@ -55,7 +52,7 @@ class Explosion(Collidable):
             # update size
             factor = self.curLifeTime/self.maxLifeTime
             self.size = self.minSize*(1-factor) + self.maxSize*factor
-            self.collisionSize = 0.5*self.size
+            self.collisionRadius = 0.25*self.size
             
             # overwrite img's alpha
             img_a = np.array(self.img.get_view('A'), copy=False)

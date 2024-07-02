@@ -13,21 +13,18 @@ from entities.Collidable import Collidable
 from utils.AssetFactory import assetFactory
 
 class Portal(Collidable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         # create/load image
-        
         self.img = assetFactory.loadImg("entities/structures/portal.png", True)
         self.size = 128 # px
+        self.collisionRadius = 0.5*self.size
         
         # physics properties
         self.mass = 1.0e9
         self.dragCoef = 20.
+        
+        # rotational velocity
+        self.rot_vel = -np.pi/1000.
 
-        
-    def update(self, dt: float):
-        super().update(dt)
-        
-        #rotation
-        self.theta -= dt*np.pi/1000. # 180 deg/s
