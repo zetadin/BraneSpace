@@ -7,25 +7,9 @@ Created on Fri May 10 13:49:55 2024
 """
 
 import pygame
-from enum import Enum, auto
+import GlobalRules
 from Brane import Brane
 
-class GameMode(Enum):
-    """
-    What game mode are we running?
-    TODO: selectable in start menu.
-    """
-    MENU = auto()
-    ASTEROIDS = auto()
-    #PIONEER = auto() # TODO
-
-class PBC(Enum):
-    """
-    Periodic boundary conditions for the physics simulation.
-    """
-    NONE = auto()       # for PIONEER eventually
-    TOROIDAL = auto()   # All sides warp
-    
 
 class Universe():
     def __init__(self, simSize: int = 128, parallel=False):
@@ -47,7 +31,7 @@ class Universe():
         if(self.parallel):
             pass
         
-    def reset(self, mode = GameMode.ASTEROIDS):
+    def reset(self):
         """
         Call when game (re)starts.
         """
@@ -60,15 +44,19 @@ class Universe():
         self.collidables.clear()
         self.destroy_these_collidables=[]
         
-        self.gameMode = mode
-        if(self.gameMode == GameMode.ASTEROIDS):
-            self.pbc = PBC.TOROIDAL
+        if(GlobalRules.mode == GlobalRules.GameMode.ASTEROIDS):
+            GlobalRules.pbc = GlobalRules.PBC.TOROIDAL
+            GlobalRules.curUniverseSize = self.simSize
+        else:
+            GlobalRules.pbc = GlobalRules.PBC.NONE
+            GlobalRules.curUniverseSize = None
             
         # Create a new brane with no wavelets
         self.brane = Brane(self.simSize)
         # register brane here to avoid a circular import
         self.drawables.add(self.brane)
         self.updatables.append(self.brane)
+        self.brane.parentUniverse = self
         
         
     def destroyRequested(self):
