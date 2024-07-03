@@ -11,6 +11,7 @@ import pygame
 
 from Brane import Brane
 from Universe import updatables, drawables
+from utils.AssetFactory import assetFactory
 
 class Entity():
     """
@@ -18,16 +19,18 @@ class Entity():
     It has position and velocity in world coordinates.
     Mixin, so can pass on constructor parameters to other superclasses.
     """
-    def __init__(self, mass=1.0, drag=0.0, *args, **kwargs):
+    def __init__(self, mass=1.0, drag=0.0,
+                 r = np.zeros(2), v = np.zeros(2), a = np.zeros(2),
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)  # forwards all unused arguments
         self.mass = mass
         self.dragCoef = drag
         
         # coordinates in world space
-        self.r = np.zeros(2)
-        self.v = np.zeros(2)
-        self.a = np.zeros(2)
-        self.dr= np.zeros(2) # change in r in this time step
+        self.r = r
+        self.v = v
+        self.a = a
+        self.dr = np.zeros(2) # change in r in this time step
         
         self.parentBrane = None
         
@@ -64,22 +67,23 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
     """
     An entity that gets drawn on sceen.
     """
-    def __init__(self, mass=50.0, drag=0.0):
+    def __init__(self, img_file=None, visible=True, size=16,
+                 theta=0.0, rot_vel=0.0,
+                 *args, **kwargs):
         # superclass constructors
-        super().__init__(mass, drag)
+        super().__init__(*args, **kwargs)
         
         # create a temp image that will be overriden
-        self.img = None
-#        self.img = pygame.Surface((16,16), flags=pygame.SRCALPHA)
-#        pygame.draw.rect(
-#                surface=self.img, color=(255, 0, 0, 255),
-#                rect=self.img.get_rect(),
-#                width=2, border_radius = 3)
+        if(not img_file is None):
+            self.img = assetFactory.loadImg(img_file, True)
+        else:
+            self.img = None
         
-        self.size = 16
+        self.visible = visible
+        self.size = size
         
-        self.theta = 0.0 # direction in radians from North (Up)
-        self.rot_vel = 0.0 # rotational velocity
+        self.theta = theta # direction in radians from North (Up)
+        self.rot_vel = rot_vel # rotational velocity
         
         
     def update(self, dt: float):
@@ -94,7 +98,8 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
         """
         # culling
         if(view.isOnScreen(self)):
-            if(not self.img is None): # check if image surface was created
+             # check if image surface was created
+            if(not self.img is None and self.visible):
                 # scale & rotate the image
                 zoom = float(self.size)*view.zoom/self.img.get_width()
                 surf = pygame.transform.rotozoom(

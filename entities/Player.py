@@ -10,10 +10,12 @@ import numpy as np
 import pygame
 from pygame.locals import *
 from entities.Collidable import MultiPartCollidable
+from entities.Entity import SpriteEntity
 from wavelets.Tractor import Tractor
 from View import HEIGHT, WIDTH
 from Universe import universe
 from utils.AssetFactory import assetFactory
+from utils.Geometry import rotMat
 
 
 class Player(MultiPartCollidable):
@@ -60,11 +62,18 @@ class Player(MultiPartCollidable):
                 ]) # x,y pairs
         self.part_radii = [10, 15, 12, 12]
         
+        # attachments: things to draw and update besides the main sprite
+        self.engine_flame = SpriteEntity("entities/player/rocket_thrust.png",
+                                    size=20, visible=False)
+        self.attachments=[self.engine_flame]
+        self.attachment_rel_positions = np.array([
+                [0, 35]
+                ])
+        
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
         # remove the extra dimention used for multiple points
         F = np.squeeze(F, axis=0)
-        
 
         if(self.fwd):
             F += self.direction * self.fwdThrust
@@ -81,6 +90,13 @@ class Player(MultiPartCollidable):
         # update ship rotation        
         self.theta += dt*self.rot_speed*self.rotationDirection
         
+        # Update positions of attachments explicitly. No physics simulation.
+        # Don't want them flying off or colliding with something for now.
+        rm = rotMat(self.theta)
+        attachment_rs = self.r + np.matmul(self.attachment_rel_positions, rm)
+        for i,a in enumerate(self.attachments):
+            a.theta = self.theta
+            a.r = attachment_rs[i]
         
         
         # every L/(2*v) seconds emit a tractor wavelet
@@ -113,6 +129,13 @@ class Player(MultiPartCollidable):
         Draw to screen
         """
         super().draw(view)
+        
+        
+        # only show engine flame if accelerating forward
+        self.engine_flame.visible = self.fwd
+        # draw attachemnts
+        for a in self.attachments:
+            a.draw(view)
         
         # Debug shapes
         if(view.debug):            
