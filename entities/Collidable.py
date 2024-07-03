@@ -41,8 +41,8 @@ class Collidable(SpriteEntity):
         
         # line segment to circle collision
         # stationary circle by changing effective velocity of self
-        vdt = (self.v - other.v) * dt # start to end
-        x   = self.r - vdt                   # start pos
+        vdt = self.dr - other.dr  # start to end
+        x   = self.r - vdt        # start pos
         cx  = other.r - x         # start to center
         ce  = other.r - self.r    # end to center
                 

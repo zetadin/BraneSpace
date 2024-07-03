@@ -39,7 +39,7 @@ class Collectable(SpriteEntity):
             
             # line segment to circle collision
             # stationary circle by changing velocity of Collectable
-            vdt = (self.v - player.collector_v) * dt # start to end
+            vdt = self.dr - player.dr            # start to end
             x   = self.r - vdt                   # start pos
             cx  = player.collector_r - x         # start to center
             ce  = player.collector_r - self.r    # end to center

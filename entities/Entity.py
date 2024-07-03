@@ -27,6 +27,7 @@ class Entity():
         self.r = np.zeros(2)
         self.v = np.zeros(2)
         self.a = np.zeros(2)
+        self.dr= np.zeros(2) # change in r in this time step
         
         self.parentBrane = None
         
@@ -41,7 +42,8 @@ class Entity():
 
         aNext -= self.dragCoef * np.abs(self.v)*self.v
         # velocity verlet
-        self.r += self.v*dt + 0.5*self.a
+        self.dr = self.v*dt + 0.5*self.a
+        self.r += self.dr
         self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
         
