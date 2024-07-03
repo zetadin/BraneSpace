@@ -7,12 +7,31 @@ Created on Fri May 10 13:49:55 2024
 """
 
 import pygame
+from enum import Enum, auto
+from Brane import Brane
+
+class GameMode(Enum):
+    """
+    What game mode are we running?
+    TODO: selectable in start menu.
+    """
+    MENU = auto()
+    ASTEROIDS = auto()
+    #PIONEER = auto() # TODO
+
+class PBC(Enum):
+    """
+    Periodic boundary conditions for the physics simulation.
+    """
+    NONE = auto()       # for PIONEER eventually
+    TOROIDAL = auto()   # All sides warp
+    
 
 class Universe():
-    def __init__(self, simsize: int = 128, parallel=False):
-        if(simsize<=0):
+    def __init__(self, simSize: int = 128, parallel=False):
+        if(simSize<=0):
             raise ValueError("simsize has to be a positive integer.")
-        self.simsize = simsize
+        self.simSize = simSize
         self.parallel = parallel
         
         self.drawables = pygame.sprite.Group()
@@ -28,7 +47,7 @@ class Universe():
         if(self.parallel):
             pass
         
-    def reset(self):
+    def reset(self, mode = GameMode.ASTEROIDS):
         """
         Call when game (re)starts.
         """
@@ -40,6 +59,17 @@ class Universe():
         self.collectables.clear()
         self.collidables.clear()
         self.destroy_these_collidables=[]
+        
+        self.gameMode = mode
+        if(self.gameMode == GameMode.ASTEROIDS):
+            self.pbc = PBC.TOROIDAL
+            
+        # Create a new brane with no wavelets
+        self.brane = Brane(self.simSize)
+        # register brane here to avoid a circular import
+        self.drawables.add(self.brane)
+        self.updatables.append(self.brane)
+        
         
     def destroyRequested(self):
         """
@@ -67,7 +97,7 @@ class Universe():
         
             
 universe = Universe(128, parallel=False)
-SIM_SIZE = universe.simsize
+SIM_SIZE = universe.simSize
 
 # game object lists for this universe
 drawables = universe.drawables

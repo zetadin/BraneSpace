@@ -11,8 +11,6 @@ import numpy.typing as npt
 import pygame
 from pygame.locals import *
 
-from wavelets.Wavelet import Wavelet
-from Universe import SIM_SIZE, updatables, drawables
 from View import HEIGHT, WIDTH
 
 
@@ -21,52 +19,33 @@ LL = 16
 
 
 class Brane(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, simSize: int):
         super().__init__()
-        self.I = np.zeros((SIM_SIZE, SIM_SIZE))
-        self.I[16, 16] = 1.
+        self.simSize = simSize
+        self.I = np.zeros((self.simSize, self.simSize)) # intensity
         self.surf = pygame.Surface((2, 2)) # temporary
         self.surf.fill((128,128,128))
         
         self.surfSize = max(WIDTH, HEIGHT)
-        self.surfScale = float(self.surfSize)/SIM_SIZE
+        self.surfScale = float(self.surfSize)/self.simSize
         self.rect = pygame.Rect(0,0,self.surfSize,self.surfSize)
         
-        pos = np.arange(SIM_SIZE)
-        self.coords = np.zeros((SIM_SIZE, SIM_SIZE, 2))
-        self.coords[:,:,0] = np.repeat(pos[:,np.newaxis], SIM_SIZE, axis=1)
-        self.coords[:,:,1] = np.repeat(pos[np.newaxis,:], SIM_SIZE, axis=0)
+        pos = np.arange(self.simSize)
+        self.coords = np.zeros((self.simSize, self.simSize, 2))
+        self.coords[:,:,0] = np.repeat(pos[:,np.newaxis], self.simSize, axis=1)
+        self.coords[:,:,1] = np.repeat(pos[np.newaxis,:], self.simSize, axis=0)
         
         self.elapsed = 0.
-        
         self.wavelets=[]
-        
         self.drawGradients = False
-        
-#        # add initial wavelet
-#        wl = Wavelet(v = VV, L=LL, A=2.5, source=np.array([16.,16.]))
-#        wl.register(self)
-        
-    def register(self):
-        # put into game object lists
-        drawables.add(self)
-        updatables.append(self)
         
         
     def update(self, dt: float):
         # update the intensity
-        self.I = np.zeros((SIM_SIZE, SIM_SIZE))
+        self.I = np.zeros((self.simSize, self.simSize))
         for wl in self.wavelets:
             wl.update(dt)
             self.I += wl.f(self.coords)
-        
-        # add a new wavelet every so often
-        self.elapsed += dt
-        if(self.elapsed > 2000):
-            self.elapsed = 0.
-#            R = np.random.random((2))*SIM_SIZE
-#            wl = Wavelet(v = VV, L = LL, A=2.5, source=R)
-#            wl.register(self)
 
 
     def draw(self, view):
@@ -85,8 +64,8 @@ class Brane(pygame.sprite.Sprite):
         if(self.drawGradients):
             gcoords = self.coords.reshape((-1,2))
             grad_arr = self.computeForceAt(gcoords*self.surfScale)
-            grad_arr = grad_arr.reshape((SIM_SIZE,SIM_SIZE,2))
-            grad_colors = np.zeros((SIM_SIZE,SIM_SIZE,3)).astype(np.uint8)
+            grad_arr = grad_arr.reshape((self.simSize,self.simSize,2))
+            grad_colors = np.zeros((self.simSize,self.simSize,3)).astype(np.uint8)
             # x -> red
             grad_colors[:,:,0] = np.floor(np.clip(256*(grad_arr[:,:,0]+1)/2, 0,255)).astype(np.uint8)
             # y -> green
@@ -95,7 +74,7 @@ class Brane(pygame.sprite.Sprite):
             grad_alpha = np.floor(np.clip(np.max(np.abs(grad_arr), axis=-1), 0.0, 0.1)*2550).astype(np.uint8)
         
             # new surface for gradient
-            grad_surf = pygame.Surface((SIM_SIZE,SIM_SIZE), pygame.SRCALPHA, 32)
+            grad_surf = pygame.Surface((self.simSize,self.simSize), pygame.SRCALPHA, 32)
             # Copy the rgb part of array to the new surface.
             pygame.pixelcopy.array_to_surface(grad_surf, grad_colors)
     

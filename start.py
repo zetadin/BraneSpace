@@ -39,11 +39,8 @@ pause_surf = pause_font.render("Press <RETURN> to Play",
 assetFactory.preloadAll()
 
 # init objects in universe
-cur_brane = Brane()
-cur_brane.register()
-
 player = Player()
-player.register(cur_brane)
+player.register(universe.brane)
 tb.bindPlayer(player)
 
 selfdot = lambda x : np.dot(x,x)
@@ -53,7 +50,7 @@ for i in range(20):
     while(selfdot(loot.r-player.r) < player.size*player.size):
         loot.r = np.random.random(2)*WIDTH
     loot.v = (np.random.random(2) - 0.5)*0.05
-    loot.register(cur_brane)
+    loot.register(universe.brane)
     
 for i in range(20):
     roid = Asteroid()
@@ -61,13 +58,13 @@ for i in range(20):
     while(selfdot(roid.r-player.r) < player.size*player.size):
         roid.r = np.random.random(2)*WIDTH
     roid.v = (np.random.random(2) - 0.5)*0.01
-    roid.register(cur_brane)
+    roid.register(universe.brane)
 
 
 
 #portal = Portal()
 #portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
-#portal.register(cur_brane)
+#portal.register(universe.brane)
 
 
 # initial guess at frame time

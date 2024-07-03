@@ -9,13 +9,12 @@ Created on Fri May 10 13:41:03 2024
 import numpy as np
 import numpy.typing as npt
 
-from Universe import SIM_SIZE
-
 class Wavelet:
     """
     Sinusoidal wavelet that terminates after one wave length.
     """
-    def __init__(self,v: float, L: float, A: float, source: npt.ArrayLike):
+    def __init__(self,v: float, L: float, A: float, source: npt.ArrayLike,
+                 maxLifetime: float=2.0):
         self.v = v
         self.L = L
         self.A = A
@@ -25,7 +24,7 @@ class Wavelet:
         self.w = self.v*self.k
         
         # lifetime
-        self.maxLifetime = (SIM_SIZE*np.sqrt(2) + self.L)/self.v
+        self.maxLifetime = maxLifetime
         self.lifetime = 0
         self.parentBrane = None
         
