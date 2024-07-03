@@ -9,6 +9,7 @@ Created on Fri May 10 15:01:10 2024
 import numpy as np
 from entities.Entity import SpriteEntity
 from Universe import updatables, drawables, collidables
+from utils.Geometry import rotMat
 import pygame
 
 class Collidable(SpriteEntity):
@@ -131,10 +132,7 @@ class MultiPartCollidable(Collidable):
                                                 rot_matrix)
             
             # find old positions of part centers
-            old_theta = self.theta - dt*self.rot_vel
-            rot_matrix = np.array([
-                    [np.cos(old_theta),   np.sin(old_theta)],
-                    [-np.sin(old_theta),  np.cos(old_theta)]])
+            rot_matrix = rotMat(self.theta - dt*self.rot_vel)
             old_part_positions = self.r-self.v*dt +\
                     np.matmul(self.part_rel_positions, rot_matrix)
                     
