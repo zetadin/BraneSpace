@@ -70,15 +70,17 @@ class Universe():
         
         
     def collisionDetect(self, dt):
-        # check for structure-structure collisions
+        # check for all collidable-collidable pairs
         for i in range(len(self.collidables)-1):
             si = self.collidables[i]
-            for j in range(i+1, len(self.collidables)):
-                sj = self.collidables[j]
-                if(si.checkCollision(sj, dt)):
-                    si.collidedWith(sj)
-                    sj.collidedWith(si)
-                    break
+            if(si.alive): # don't check collidables that are already destoyed
+                for j in range(i+1, len(self.collidables)):
+                    sj = self.collidables[j]
+                    if(sj.alive):
+                        if(si.checkCollision(sj, dt)):
+                            si.collidedWith(sj)
+                            sj.collidedWith(si)
+                            break
                     
         self.destroyRequested()
             

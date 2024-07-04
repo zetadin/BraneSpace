@@ -24,6 +24,10 @@ class Collidable(SpriteEntity):
         super().__init__(*args, **kwargs)
         self.collisionRadius = 0.5*self.size
         
+        # Should we take part in colision detection.
+        # Set to False when requesting destruction.
+        self.alive = True
+        
     
     def register(self, brane: "Brane"):
         """Add to the list of objects in the universe."""

@@ -52,6 +52,7 @@ class Asteroid(Collidable):
         expl.register(self.parentBrane)
             
         # request destruction, delayed until end of update
+        self.alive = False # don't collision detect agains this anymore
         universe.destroy_these_collidables.append(self)
         print("Roid deletion requested")
         
