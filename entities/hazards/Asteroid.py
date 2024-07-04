@@ -37,8 +37,10 @@ class Asteroid(Collidable):
         """Handle collisions.
         Asteroid gets destroyed and spawns some dark matter.
         """
+        print("Roid collided with", other)
         COM_v = (self.v*self.mass + other.v*other.mass)/(self.mass+other.mass)
-        for i in range(np.random.randint(1,3)):
+        #for i in range(np.random.randint(1,3)):
+        for i in range(1):
             loot = DarkMatter()
             loot.r = self.r
             loot.v = COM_v + (np.random.random(2) - 0.5)*0.1
@@ -51,3 +53,10 @@ class Asteroid(Collidable):
             
         # request destruction, delayed until end of update
         universe.destroy_these_collidables.append(self)
+        print("Roid deletion requested")
+        
+        
+    def destroy(self):
+        super().destroy()
+        print("Roid deleted")
+        

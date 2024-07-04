@@ -7,9 +7,10 @@ Created on Fri May 10 15:01:10 2024
 """
 
 import numpy as np
+import GlobalRules
 from entities.Entity import SpriteEntity
 from Universe import updatables, drawables, collidables
-from utils.Geometry import rotMat
+from utils.Geometry import rotMat, expandPeriodicImages
 import pygame
 
 class Collidable(SpriteEntity):
@@ -34,36 +35,47 @@ class Collidable(SpriteEntity):
         """
         Do collision detection with another Collidable.
         """
-        collided = False
-            
-        # TODO: fast filtering of many misses
-        # Are they close enough and moving fast enough to collide on each axis?
-        
+        collided = False       
         
         # line segment to circle collision
         # stationary circle by changing effective velocity of self
-        vdt = self.dr - other.dr  # start to end
-        x   = self.r - vdt        # start pos
-        cx  = other.r - x         # start to center
-        ce  = other.r - self.r    # end to center
-                
-        # end points in radius
         collision_radius = self.collisionRadius + other.collisionRadius
         collision_radius_sq = collision_radius*collision_radius
-        if(np.dot(cx,cx)<=collision_radius_sq):
-            collided = True
-        elif(np.dot(ce,ce)<=collision_radius_sq):
-            collided = True
-        # projection in segment?
+        
+        vdt = self.dr - other.dr  # start to end
+        x   = self.r - vdt        # start pos
+        
+        # with PBC, check agains each image of other
+        # this is sufficient only if vdt < 0.5 * GlobalRules.curUniverseSize
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            other_rs = expandPeriodicImages(other.r,
+                                            GlobalRules.curUniverseSize)
         else:
-            vdtsq = np.dot(vdt,vdt)
-            u = np.dot(cx, vdt)/vdtsq
-            if(u>=0.0 and u<=1.0):
-                # check distance to center
-                psq = u*u*vdtsq # (pos on start-end segment)^2
-                dsq = np.dot(cx, cx) - psq # closest distance to center ^2
-                if(dsq<=collision_radius_sq):
-                    collided = True
+            other_rs = [other.r]
+        
+        # loop through images. Stop when one collision found
+        for otr in other_rs:
+            cx  = otr - x         # start to center
+            ce  = otr - self.r    # end to center
+                
+            # end points in radius
+            if(np.dot(cx,cx)<=collision_radius_sq):
+                collided = True
+                break
+            elif(np.dot(ce,ce)<=collision_radius_sq):
+                collided = True
+                break
+            # projection in segment?
+            else:
+                vdtsq = np.dot(vdt,vdt)
+                u = np.dot(cx, vdt)/vdtsq
+                if(u>=0.0 and u<=1.0):
+                    # check distance to center
+                    psq = u*u*vdtsq # (pos on start-end segment)^2
+                    dsq = np.dot(cx, cx) - psq # closest distance to center ^2
+                    if(dsq<=collision_radius_sq):
+                        collided = True
+                        break
     
         return(collided)
         

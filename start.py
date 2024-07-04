@@ -46,7 +46,7 @@ player.register(universe.brane)
 tb.bindPlayer(player)
 
 selfdot = lambda x : np.dot(x,x)
-for i in range(20):
+for i in range(0):
     loot = DarkMatter()
     loot.r = np.random.random(2)*WIDTH
     while(selfdot(loot.r-player.r) < player.size*player.size):

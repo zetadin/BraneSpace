@@ -51,8 +51,17 @@ class Entity():
         aNext -= self.dragCoef * np.abs(self.v)*self.v
         # velocity verlet
         self.dr = self.v*dt + 0.5*self.a
+        
+        
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # limit movement to 1/4 a periodic box/update
+            self.dr = np.clip(self.v*dt + 0.5*self.a,
+                              -0.25*GlobalRules.curUniverseSize,
+                              0.25*GlobalRules.curUniverseSize)
+
+        self.v += 0.5*dt*(self.a+aNext) # drag limits max v
+        
         self.r += self.dr
-        self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
         
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
@@ -124,6 +133,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                             # draw that image to screen
                             rect = surf.get_rect(center=view.transform(pos[i]))
                             view.displaysurface.blit(surf, rect)
+                    self.periodic_visibility = vis
                     
                 else:
                     # draw single image to screen

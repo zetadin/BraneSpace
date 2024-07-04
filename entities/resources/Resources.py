@@ -80,7 +80,7 @@ class DarkMatter(Collectable):
         self.size = 16 # px
         
         # physics properties
-        self.mass = 5.0e1
+        self.mass = 1.0e2
         self.dragCoef = 0.05
 
         
