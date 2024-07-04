@@ -11,7 +11,6 @@ import pygame
 
 import GlobalRules
 from Brane import Brane
-from Universe import updatables, drawables
 from utils.AssetFactory import assetFactory
 
 class Entity():
@@ -77,8 +76,8 @@ class Entity():
 
     def register(self, brane: Brane):
         """Add to the list of objects in the universe."""
-        updatables.append(self)
         self.parentBrane = brane
+        self.parentBrane.parentUniverse.updatables.append(self)
         
         
         
@@ -144,4 +143,4 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
     def register(self, brane: Brane):
         """Add to the list of objects in the universe."""
         super().register(brane)
-        drawables.add(self)
+        self.parentBrane.parentUniverse.drawables.add(self)        

@@ -12,11 +12,13 @@ from Brane import Brane
 
 
 class Universe():
-    def __init__(self, simSize: int = 128, parallel=False):
-        if(simSize<=0):
-            raise ValueError("simsize has to be a positive integer.")
-        self.simSize = simSize
+    def __init__(self, view: "View", parallel: bool = False,
+                 braneSurfScale: float = 4.):
+        if(braneSurfScale<=0):
+            raise ValueError("braneSurfScale has to be a positive.")
+        self.braneSurfScale = braneSurfScale
         self.parallel = parallel
+        self.view = view
         
         self.drawables = pygame.sprite.Group()
         self.updatables=[]
@@ -52,11 +54,11 @@ class Universe():
             GlobalRules.curUniverseSize = None
             
         # Create a new brane with no wavelets
-        self.brane = Brane(self.simSize)
+        self.brane = Brane(self.braneSurfScale, self.view)
+        self.brane.parentUniverse = self
         # register brane here to avoid a circular import
         self.drawables.add(self.brane)
         self.updatables.append(self.brane)
-        self.brane.parentUniverse = self
         
         
     def destroyRequested(self):
@@ -86,11 +88,11 @@ class Universe():
             
         
             
-universe = Universe(128, parallel=False)
-SIM_SIZE = universe.simSize
-
-# game object lists for this universe
-drawables = universe.drawables
-updatables = universe.updatables
-collectables = universe.collectables
-collidables = universe.collidables
+#universe = Universe(4.0, view, parallel=False)
+#SIM_SIZE = universe.simSize
+#
+## game object lists for this universe
+#drawables = universe.drawables
+#updatables = universe.updatables
+#collectables = universe.collectables
+#collidables = universe.collidables

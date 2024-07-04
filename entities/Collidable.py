@@ -9,7 +9,6 @@ Created on Fri May 10 15:01:10 2024
 import numpy as np
 import GlobalRules
 from entities.Entity import SpriteEntity
-from Universe import updatables, drawables, collidables
 from utils.Geometry import rotMat, expandPeriodicImages
 
 class Collidable(SpriteEntity):
@@ -31,7 +30,7 @@ class Collidable(SpriteEntity):
     def register(self, brane: "Brane"):
         """Add to the list of objects in the universe."""
         super().register(brane)
-        collidables.append(self)
+        self.parentBrane.parentUniverse.collidables.append(self)
         
         
     def checkCollision(self, other: "Collidable", dt):
@@ -97,9 +96,13 @@ class Collidable(SpriteEntity):
         detection is done. Hence collidable is marked for delayed destruction.
         Every collidable is responcible for it's own marking.
         """
-        if self in collidables: collidables.remove(self)
-        if self in updatables: updatables.remove(self)
-        if self in drawables: drawables.remove(self)
+        
+        if self in self.parentBrane.parentUniverse.collidables:
+            self.parentBrane.parentUniverse.collidables.remove(self)
+        if self in self.parentBrane.parentUniverse.updatables:
+            self.parentBrane.parentUniverse.updatables.remove(self)
+        if self in self.parentBrane.parentUniverse.drawables:
+            self.parentBrane.parentUniverse.drawables.remove(self)
         
         
     def draw(self, view):
@@ -130,7 +133,7 @@ class Collidable(SpriteEntity):
 
 class MultiPartCollidable(Collidable):
     """
-    These Collidables don't need a finer shape for collision detection.
+    These Collidables don't need a finer sself.parentBrane.parentUniverse.hape for collision detection.
     They have multiple circular parts inside their outer collision radius.
     If collision on outer radius is detected, verify it with inner parts.
     """

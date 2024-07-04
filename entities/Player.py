@@ -11,7 +11,6 @@ from entities.Collidable import MultiPartCollidable
 from entities.Entity import SpriteEntity
 from wavelets.Tractor import Tractor
 from UI.View import HEIGHT, WIDTH
-from Universe import universe
 from utils.AssetFactory import assetFactory
 from utils.Geometry import rotMat
 
@@ -106,12 +105,12 @@ class Player(MultiPartCollidable):
                 
                 # source of the wave in sim coords
                 # a bit forward of player ship
-                start = (self.r + 20*self.direction)/self.parentBrane.surfScale
+                start = (self.r + 20*self.direction)
                 wl = Tractor(source=start, direction=self.direction,
                              v = 3.2e-2,
                              L = 8.0,
                              A = 0.1,
-                             Rmax = 128./self.parentBrane.surfScale, # in sim coords
+                             Rmax = 128., # in world coords
                              debug=False)
                 wl.alive = self.tractorElapsed
                 wl.register(self.parentBrane)
@@ -159,7 +158,7 @@ class Player(MultiPartCollidable):
         # Is it dangerous?
         if(other_type in ["Asteroid", "Explosion"]):
             # then game over
-            universe.game_over = True
+            self.parentBrane.parentUniverse.game_over = True
             
         # TODO: otherwize do a perfect eleastic collision
         # but only if both objects are still ok.

@@ -10,7 +10,6 @@ import numpy as np
 import numpy.typing as npt
 import GlobalRules
 from entities.Entity import SpriteEntity
-from Universe import updatables, drawables, collectables
 from utils.AssetFactory import assetFactory
 from utils.Geometry import expandPeriodicImages
 
@@ -24,7 +23,7 @@ class Collectable(SpriteEntity):
     def register(self, brane: "Brane"):
         """Add to the list of objects in the universe."""
         super().register(brane)
-        collectables.append(self)
+        self.parentBrane.parentUniverse.collectables.append(self)
         
     def addToPlayer(self, player: "Player"):
         """
@@ -80,9 +79,9 @@ class Collectable(SpriteEntity):
                 self.addToPlayer(player)
                 
                 # remove instance from object lists
-                collectables.remove(self)
-                updatables.remove(self)
-                drawables.remove(self)
+                self.parentBrane.parentUniverse.collectables.remove(self)
+                self.parentBrane.parentUniverse.updatables.remove(self)
+                self.parentBrane.parentUniverse.drawables.remove(self)
                 # this instance can now be garbage collected
 
 

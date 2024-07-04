@@ -7,7 +7,6 @@ Created on Wed May 15 10:21:47 2024
 """
 
 from wavelets.Wavelet import Wavelet
-from Universe import drawables
 import numpy as np
 import numpy.typing as npt
 import pygame
@@ -58,7 +57,7 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         super().register(brane)
         
         if self.debug:
-            drawables.add(self)
+            self.parentBrane.parentUniverse.drawables.add(self)
             
         
     def update(self, dt: float):

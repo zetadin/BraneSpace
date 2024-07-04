@@ -11,7 +11,6 @@ import pygame
 from pygame.locals import *
 from entities.Collidable import Collidable
 from entities.resources.Resources import DarkMatter
-from Universe import universe
 from utils.AssetFactory import assetFactory
 
 

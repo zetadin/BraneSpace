@@ -15,15 +15,17 @@ from entities.resources.Resources import DarkMatter
 from entities.structures.Portal import Portal
 from entities.hazards.Asteroid import Asteroid
 from entities.Player import Player
-from Universe import updatables, drawables, collectables, universe
+from Universe import Universe
 from UI.TopBar import TopBar
 from utils.AssetFactory import assetFactory
 import time
 
-
-universe.reset()
+# create a viewport
 view = View()
 view.debug = True
+
+# create a universe. It will in turn create a brane.
+universe = Universe(view, parallel=False, braneSurfScale=4.0)
 
 # init UI
 tb = TopBar(view)
@@ -139,14 +141,14 @@ while True:
             startTime = time.time()
             
             # update objects
-            for entity in updatables:
+            for entity in universe.updatables:
                 entity.update(update_dt)
                 
             # collisions between collidables (including player)
             universe.collisionDetect(update_dt)
                 
             # attepmpt picking up collectables
-            player.attemptPickUp(collectables, view, update_dt)
+            player.attemptPickUp(universe.collectables, view, update_dt)
             
             update_ms = (time.time()-startTime)*1000.
             update_ms_left -= update_ms
@@ -162,7 +164,7 @@ while True:
     view.displaysurface.fill((0,0,0))
  
     # draw everything
-    for entity in drawables:
+    for entity in universe.drawables:
         entity.draw(view)
         
         

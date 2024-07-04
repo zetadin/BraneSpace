@@ -9,8 +9,8 @@ Created on Fri May 10 13:37:21 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-
-from UI.View import HEIGHT, WIDTH
+import GlobalRules
+from utils.Geometry import expandPeriodicImages
 
 
 VV = 32/1000.
@@ -18,21 +18,15 @@ LL = 16
 
 
 class Brane(pygame.sprite.Sprite):
-    def __init__(self, simSize: int):
+    def __init__(self, surf_scale: float, view: "View"):
         super().__init__()
-        self.simSize = simSize
-        self.I = np.zeros((self.simSize, self.simSize)) # intensity
-        self.surf = pygame.Surface((2, 2)) # temporary
-        self.surf.fill((128,128,128))
+        self.setView(view)
         
-        self.surfSize = max(WIDTH, HEIGHT)
-        self.surfScale = float(self.surfSize)/self.simSize
-        self.rect = pygame.Rect(0,0,self.surfSize,self.surfSize)
+        self.surfScale = surf_scale
+        self.calculateSimShape()
         
-        pos = np.arange(self.simSize)
-        self.coords = np.zeros((self.simSize, self.simSize, 2))
-        self.coords[:,:,0] = np.repeat(pos[:,np.newaxis], self.simSize, axis=1)
-        self.coords[:,:,1] = np.repeat(pos[np.newaxis,:], self.simSize, axis=0)
+        self.I = None # intensity
+        self.surf = None # temporary
         
         self.elapsed = 0.
         self.wavelets=[]
@@ -41,9 +35,41 @@ class Brane(pygame.sprite.Sprite):
         self.parentUniverse = None
         
         
+    def setView(self, view: "View"):
+        """
+        Link Brane to a view so info about screen size is acessible.
+        """
+        self.view = view
+        
+        
+    def calculateSimShape(self):
+        """
+        Calculate the dimentions of the simulation to fill the window
+        and the coordinate grid that spans it.
+        """
+        screenShape = np.array(self.view.displaysurface.get_size())
+        self.simShape = np.ceil(screenShape/self.surfScale).astype(int)
+        
+        # also compute the coordinate grid in world coords
+        grid_x = np.arange(self.simShape[0])*self.surfScale
+        grid_y = np.arange(self.simShape[1])*self.surfScale
+        
+        self.coords = np.zeros((self.simShape[0], self.simShape[1], 2))
+        self.coords[:,:,0] = np.repeat(grid_x[:,np.newaxis],
+                                       self.simShape[0], axis=1)
+        self.coords[:,:,1] = np.repeat(grid_y[np.newaxis,:],
+                                       self.simShape[1], axis=0)
+        
+        
     def update(self, dt: float):
+        """
+        Calculate sum of all wavelet intensities in the simulated region.
+        """
+        # move coords so they are centered on screen
+        #TODO
+        
         # update the intensity
-        self.I = np.zeros((self.simSize, self.simSize))
+        self.I = np.zeros(self.simShape)
         for wl in self.wavelets:
             wl.update(dt)
             self.I += wl.f(self.coords)
@@ -53,9 +79,21 @@ class Brane(pygame.sprite.Sprite):
         """
         Draw to screen
         """
+        if(view is not self.view): # view changed and Brane was not told!
+            # set new view, recalculate grid, and update intensity
+            self.setView(view)
+            self.calculateSimShape()
+            self.I = np.zeros(self.simShape)
+            for wl in self.wavelets:
+                self.I += wl.f(self.coords)
         
-        screen = view.displaysurface
-        
+        if(self.I is None):
+            # We may have started paused, so no updates have occured yet
+            # Calculate intensity now.
+            self.I = np.zeros(self.simShape)
+            for wl in self.wavelets:
+                self.I += wl.f(self.coords)
+            
         # re-paint the surface from simulation
         amp_arr = np.floor(np.clip(256*(self.I*4.0+1)/2, 0,255)).astype(np.uint8)
         amp_arr = np.repeat(amp_arr[:, :, np.newaxis], 3, axis=2)
@@ -64,9 +102,9 @@ class Brane(pygame.sprite.Sprite):
         # gradients
         if(self.drawGradients):
             gcoords = self.coords.reshape((-1,2))
-            grad_arr = self.computeForceAt(gcoords*self.surfScale)
-            grad_arr = grad_arr.reshape((self.simSize,self.simSize,2))
-            grad_colors = np.zeros((self.simSize,self.simSize,3)).astype(np.uint8)
+            grad_arr = self.computeForceAt(gcoords)
+            grad_arr = grad_arr.reshape((self.simShape[0],self.simShape[1],2))
+            grad_colors = np.zeros((self.simShape[0],self.simShape[1],3)).astype(np.uint8)
             # x -> red
             grad_colors[:,:,0] = np.floor(np.clip(256*(grad_arr[:,:,0]+1)/2, 0,255)).astype(np.uint8)
             # y -> green
@@ -75,7 +113,7 @@ class Brane(pygame.sprite.Sprite):
             grad_alpha = np.floor(np.clip(np.max(np.abs(grad_arr), axis=-1), 0.0, 0.1)*2550).astype(np.uint8)
         
             # new surface for gradient
-            grad_surf = pygame.Surface((self.simSize,self.simSize), pygame.SRCALPHA, 32)
+            grad_surf = pygame.Surface((self.simShape[0],self.simShape[1]), pygame.SRCALPHA, 32)
             # Copy the rgb part of array to the new surface.
             pygame.pixelcopy.array_to_surface(grad_surf, grad_colors)
     
@@ -88,23 +126,19 @@ class Brane(pygame.sprite.Sprite):
             amp_surf.blit(grad_surf, grad_surf.get_rect())
 
         # transform into screen coords
-        self.surf = pygame.transform.smoothscale(
-                        amp_surf, (screen.get_width(), screen.get_height())
-                        )
+        self.surf = pygame.transform.smoothscale_by(
+                        amp_surf, self.surfScale*self.view.zoom)
         
         # draw to screen
-        screen.blit(self.surf, self.rect)
+        self.view.drawSurfToView(self.surf, view.center)
         
         
     def computeForceAt(self, x: npt.ArrayLike) -> npt.ArrayLike:
-        # transform x into the simulation coordinates
-        x = x/self.surfScale
-        
+        """
+        Compute force from wavelets at given world coordinates.
+        """
         # ask all wavelets for their force contributions
         F = np.zeros(x.shape)
         for wl in self.wavelets:
             F -= wl.gradf(x)
-            
-        # move force back into screen coordinate space
-        F *= self.surfScale
         return(F)
