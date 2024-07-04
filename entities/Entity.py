@@ -135,7 +135,7 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                             # draw that image to screen
                             rect = surf.get_rect(center=view.transform(pos[i]))
                             view.displaysurface.blit(surf, rect)
-                    self.periodic_visibility = vis
+                    self.periodic_images = (vis,pos)
                     
                 else:
                     # draw single image to screen
