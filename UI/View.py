@@ -14,8 +14,10 @@ from utils.Geometry import expandPeriodicImages
 from pygame.locals import *
 from GlobalRules import HEIGHT, WIDTH
 
+
 # cached value for optimization
 SQRT2 = np.sqrt(2)
+
 
 class View():
     def __init__(self):
@@ -25,8 +27,9 @@ class View():
         self.FramePerSec = pygame.time.Clock()
         
         # add a window
+        self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT),
+                                                      pygame.locals.RESIZABLE)
         self.screen_box = np.array([WIDTH, HEIGHT])
-        self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("BraneSpace")
         
         # fonts
@@ -39,6 +42,15 @@ class View():
         #self.corner = self.center - self.screen_box*0.5 # screen corner
         
         self.debug = False
+        
+    def resize(self, w, h):
+        # make changes from resizing avilable globaly even without importing View
+        global HEIGHT
+        global WIDTH
+        
+        WIDTH = w
+        HEIGHT = h
+        self.screen_box = np.array([WIDTH, HEIGHT])
         
         
     def isOnScreen(self, ent: "Entity") -> bool:

@@ -103,7 +103,7 @@ while True:
             elif event.key == pygame.K_SPACE:
                 player.tractor = True
                 
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP:
             # rotation
             if event.key in [pygame.K_LEFT, pygame.K_RIGHT,
                              pygame.K_a, pygame.K_d]:
@@ -124,6 +124,11 @@ while True:
             # quit
             elif event.key == pygame.K_RETURN:
                 universe.paused = not universe.paused
+                
+        elif event.type == pygame.VIDEORESIZE:
+            # window changed size
+            view.resize(event.w,event.h)
+            tb.calcSizes(view)
                 
             
     # run the force calculation, position updates, and collision detection

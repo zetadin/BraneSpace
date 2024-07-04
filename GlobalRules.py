@@ -34,6 +34,8 @@ global curUniverseSize
 curUniverseSize = None
 
 
+global HEIGHT
 HEIGHT = 600
+global WIDTH
 WIDTH = 600
 FPS = 60

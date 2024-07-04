@@ -15,6 +15,9 @@ from utils.AssetFactory import assetFactory
 
 
 class TopBar(pygame.sprite.Sprite):
+    """
+    UI: Info panel at top of the window.
+    """
     def __init__(self, view: View):
         self.bkgImg = assetFactory.loadImg("UI/RustedMetal.png", False)
         self.border = assetFactory.loadImg("UI/Toolbar_edge_128.png", False)
