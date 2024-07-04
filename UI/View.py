@@ -35,9 +35,11 @@ class View():
         self.serif_font_px_size = 24 # size in pixels
         
         self.zoom = 1.
-        self.center = self.screen_box*0.5 # in world coords
+        self.center = self.screen_box*0.5 # screen center in world coords
+        #self.corner = self.center - self.screen_box*0.5 # screen corner
         
         self.debug = False
+        
         
     def isOnScreen(self, ent: "Entity") -> bool:
         """
@@ -56,6 +58,7 @@ class View():
         cond = dif[nearest] < (0.5*self.screen_box + ent.size*SQRT2)/self.zoom
         return(np.all(cond))
         
+        
     def periodicImagesOnScreen(self, ent: "Entity") -> (npt, npt):
         """
         Which periodic images are on screen?
@@ -65,6 +68,32 @@ class View():
         dif = np.abs(self.center - pos)
         cond = dif < ((0.5*self.screen_box + ent.size*SQRT2)/self.zoom)[np.newaxis,:]
         return(np.all(cond, axis=-1), pos)
+        
+        
+    def drawSurfToView(self, surf: "pygame.Surface", r: npt):
+        """
+        Draw a single surface to screen at world coordinates r.
+        Will adjust position on screen accordeeing to view movement.
+        """
+        pos = self.transform(r)
+        rect = surf.get_rect(center=pos)
+        self.displaysurface.blit(surf, rect)
+        
+    def drawCircleToView(self, color: tuple, r: npt, radius: float,
+                         thickness: float = 2):
+        """
+        Draw a single circle to screen at world coordinates r.
+        Will adjust position on screen accordeeing to view movement.
+        """
+        pygame.draw.circle(self.displaysurface, color, self.transform(r),
+                            radius, thickness)
+        
+        
+    def keepPlayerInView(self, player_r: npt):
+        """
+        Adjusts view coordinates to track player.
+        """
+        pass
         
         
     def transform(self, r: npt) -> npt:

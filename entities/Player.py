@@ -7,12 +7,10 @@ Created on Fri May 10 15:07:40 2024
 """
 
 import numpy as np
-import pygame
-from pygame.locals import *
 from entities.Collidable import MultiPartCollidable
 from entities.Entity import SpriteEntity
 from wavelets.Tractor import Tractor
-from View import HEIGHT, WIDTH
+from UI.View import HEIGHT, WIDTH
 from Universe import universe
 from utils.AssetFactory import assetFactory
 from utils.Geometry import rotMat
@@ -64,7 +62,7 @@ class Player(MultiPartCollidable):
         
         # attachments: things to draw and update besides the main sprite
         self.engine_flame = SpriteEntity("entities/player/rocket_thrust.png",
-                                    size=20, visible=False)
+                                         size=20, visible=False)
         self.attachments=[self.engine_flame]
         self.attachment_rel_positions = np.array([
                 [0, 35]

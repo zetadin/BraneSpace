@@ -9,9 +9,8 @@ Created on Fri May 10 13:37:21 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-from pygame.locals import *
 
-from View import HEIGHT, WIDTH
+from UI.View import HEIGHT, WIDTH
 
 
 VV = 32/1000.

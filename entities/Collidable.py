@@ -11,7 +11,6 @@ import GlobalRules
 from entities.Entity import SpriteEntity
 from Universe import updatables, drawables, collidables
 from utils.Geometry import rotMat, expandPeriodicImages
-import pygame
 
 class Collidable(SpriteEntity):
     """
@@ -57,7 +56,7 @@ class Collidable(SpriteEntity):
         else:
             other_rs = [other.r]
         
-        # loop through images. Stop when one collision found
+        # loop through imagesView. Stop when one collision found
         for otr in other_rs:
             cx  = otr - x         # start to center
             ce  = otr - self.r    # end to center
@@ -121,16 +120,12 @@ class Collidable(SpriteEntity):
                 vis, pos = self.periodic_images # read cached values
                 for im in range(vis.shape[0]):
                     if(vis[im]): # only draw if image on screen
-                        pygame.draw.circle(view.displaysurface,
-                                           collision_color,
-                                           pos[im],
-                                           self.collisionRadius, 2)
+                        view.drawCircleToView(collision_color, pos[im],
+                                              self.collisionRadius, 2)
             else:
                 # without PBC, just draw the collision circles in primary cell
-                pygame.draw.circle(view.displaysurface,
-                                   collision_color,
-                                   self.r,
-                                   self.collisionRadius, 2)
+                view.drawCircleToView(collision_color, self.r,
+                                      self.collisionRadius, 2)
 
 
 class MultiPartCollidable(Collidable):
@@ -213,15 +208,13 @@ class MultiPartCollidable(Collidable):
                     if(vis[im]): # only draw if image on screen
                         screen_image_pos = screen_positions - self.r + pos[im]
                         for i in range(len(self.part_radii)):
-                            pygame.draw.circle(view.displaysurface,
-                                               collision_color,
-                                               screen_image_pos[i],
-                                               self.part_radii[i], 2)
+                            view.drawCircleToView(collision_color,
+                                                  screen_image_pos[i],
+                                                  self.part_radii[i], 2)
             else:
                 # without PBC, just draw the collision circles in primary cell
                 for i in range(len(self.part_radii)):
-                    pygame.draw.circle(view.displaysurface,
-                                       collision_color,
-                                       screen_positions[i],
-                                       self.part_radii[i], 2)
+                    view.drawCircleToView(collision_color,
+                                          screen_positions[i],
+                                          self.part_radii[i], 2)
                     

@@ -10,7 +10,7 @@ import numpy as np
 import numpy.typing as npt
 import pygame
 from pygame.locals import *
-from View import View
+from UI.View import View
 from utils.AssetFactory import assetFactory
 
 

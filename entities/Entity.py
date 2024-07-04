@@ -133,14 +133,12 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                     for i in range(vis.shape[0]):
                         if(vis[i]): # check visibility of each image
                             # draw that image to screen
-                            rect = surf.get_rect(center=view.transform(pos[i]))
-                            view.displaysurface.blit(surf, rect)
+                            view.drawSurfToView(surf, pos[i])
                     self.periodic_images = (vis,pos)
                     
                 else:
                     # draw single image to screen
-                    rect = surf.get_rect(center=view.transform(self.r))
-                    view.displaysurface.blit(surf, rect)
+                    view.drawSurfToView(surf, self.r)
         
 
     def register(self, brane: Brane):

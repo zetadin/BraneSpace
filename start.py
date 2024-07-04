@@ -7,7 +7,7 @@ import numpy as np
 
 #import GlobalRules
 from Brane import Brane
-from View import View
+from UI.View import View
 from GlobalRules import HEIGHT, WIDTH, FPS
 from entities.Entity import SpriteEntity
 from entities.SimpleObjects import Ball
