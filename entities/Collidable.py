@@ -180,7 +180,7 @@ class MultiPartCollidable(Collidable):
         super().draw(view)
         
         # Debug shapes
-        if(view.debug):            
+        if(view.debug):
             # detailed collision circles
             rot_matrix = np.array([
                     [np.cos(self.theta),   np.sin(self.theta)],

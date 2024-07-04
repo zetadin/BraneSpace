@@ -36,6 +36,7 @@ class Entity():
         # warp r into primary box image
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
             self.r = np.fmod(self.r, GlobalRules.curUniverseSize)
+            self.r[self.r<0] += GlobalRules.curUniverseSize
         
         self.parentBrane = None
         
@@ -66,6 +67,7 @@ class Entity():
         
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
             self.r = np.fmod(self.r, GlobalRules.curUniverseSize)
+            self.r[self.r<0] += GlobalRules.curUniverseSize
         
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
