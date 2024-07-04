@@ -39,6 +39,8 @@ class Brane(pygame.sprite.Sprite):
         self.wavelets=[]
         self.drawGradients = False
         
+        self.parentUniverse = None
+        
         
     def update(self, dt: float):
         # update the intensity

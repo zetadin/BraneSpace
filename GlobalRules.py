@@ -32,3 +32,8 @@ global mode
 mode = GameMode.ASTEROIDS
 global curUniverseSize
 curUniverseSize = None
+
+
+HEIGHT = 600
+WIDTH = 600
+FPS = 60

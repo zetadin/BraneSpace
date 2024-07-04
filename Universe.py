@@ -46,7 +46,7 @@ class Universe():
         
         if(GlobalRules.mode == GlobalRules.GameMode.ASTEROIDS):
             GlobalRules.pbc = GlobalRules.PBC.TOROIDAL
-            GlobalRules.curUniverseSize = self.simSize
+            GlobalRules.curUniverseSize = GlobalRules.WIDTH
         else:
             GlobalRules.pbc = GlobalRules.PBC.NONE
             GlobalRules.curUniverseSize = None

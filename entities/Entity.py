@@ -9,6 +9,7 @@ Created on Fri May 10 13:31:16 2024
 import numpy as np
 import pygame
 
+import GlobalRules
 from Brane import Brane
 from Universe import updatables, drawables
 from utils.AssetFactory import assetFactory
@@ -32,6 +33,10 @@ class Entity():
         self.a = a
         self.dr = np.zeros(2) # change in r in this time step
         
+        # warp r into primary box image
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            self.r = np.fmod(self.r, GlobalRules.curUniverseSize)
+        
         self.parentBrane = None
         
     def update(self, dt: float):
@@ -49,6 +54,9 @@ class Entity():
         self.r += self.dr
         self.v += 0.5*dt*(self.a+aNext)
         self.a = aNext
+        
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            self.r = np.fmod(self.r, GlobalRules.curUniverseSize)
         
     def calcForce(self):
         F = self.parentBrane.computeForceAt(self.r[np.newaxis,:])
@@ -94,7 +102,8 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                 
     def draw(self, view):
         """
-        Draw to screen
+        Draw to screen.
+        Supports PBC.
         """
         # culling
         if(view.isOnScreen(self)):
@@ -107,11 +116,19 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
                         -self.theta*180./np.pi, # in deg CCW of North (Up)
                         zoom)
                 
-                # update position on screen
-                rect = surf.get_rect(center=view.transform(self.r))
-                
-                # draw to screen
-                view.displaysurface.blit(surf, rect)
+                if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+                    # find visible periodic images and their coords
+                    vis, pos = view.periodicImagesOnScreen(self)
+                    for i in range(vis.shape[0]):
+                        if(vis[i]): # check visibility of each image
+                            # draw that image to screen
+                            rect = surf.get_rect(center=view.transform(pos[i]))
+                            view.displaysurface.blit(surf, rect)
+                    
+                else:
+                    # draw single image to screen
+                    rect = surf.get_rect(center=view.transform(self.r))
+                    view.displaysurface.blit(surf, rect)
         
 
     def register(self, brane: Brane):

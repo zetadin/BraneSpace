@@ -9,13 +9,10 @@ Created on Fri May 10 14:09:34 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
+import GlobalRules
+from utils.Geometry import expandPeriodicImages
 from pygame.locals import *
-
-
-
-HEIGHT = 600
-WIDTH = 600
-FPS = 60
+from GlobalRules import HEIGHT, WIDTH
 
 # cached value for optimization
 SQRT2 = np.sqrt(2)
@@ -46,9 +43,29 @@ class View():
         """
         Check if entity is in screen area and should be drawn.
         """
-        dif = np.abs(self.center - ent.r)
-        cond = dif < (0.5*self.screen_box + ent.size*SQRT2)/self.zoom
+        
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # if pbc, check if nearest image of ent is on screen
+            pos = expandPeriodicImages(ent.r, GlobalRules.curUniverseSize)
+        else:
+            pos = ent.r[np.newaxis,:]
+
+        dif = np.abs(self.center - pos)
+        dif_sq = np.einsum("ij,ij->i", dif,dif) # dot only in last axis
+        nearest = np.argmin(dif_sq) # index of nearest image
+        cond = dif[nearest] < (0.5*self.screen_box + ent.size*SQRT2)/self.zoom
         return(np.all(cond))
+        
+    def periodicImagesOnScreen(self, ent: "Entity") -> (npt, npt):
+        """
+        Which periodic images are on screen?
+        Returns theiir visibility along with in-universe image coordinates.
+        """
+        pos = expandPeriodicImages(ent.r, GlobalRules.curUniverseSize)
+        dif = np.abs(self.center - pos)
+        cond = dif < ((0.5*self.screen_box + ent.size*SQRT2)/self.zoom)[np.newaxis,:]
+        return(np.all(cond, axis=-1), pos)
+        
         
     def transform(self, r: npt) -> npt:
         """
