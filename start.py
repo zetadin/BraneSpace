@@ -46,7 +46,7 @@ player.register(universe.brane)
 tb.bindPlayer(player)
 
 selfdot = lambda x : np.dot(x,x)
-for i in range(0):
+for i in range(10):
     loot = DarkMatter()
     loot.r = np.random.random(2)*WIDTH
     while(selfdot(loot.r-player.r) < player.size*player.size):
@@ -59,7 +59,7 @@ for i in range(20):
     roid.r = np.random.random(2)*WIDTH*0.8 + 0.1*WIDTH
     while(selfdot(roid.r-player.r) < player.size*player.size):
         roid.r = np.random.random(2)*WIDTH
-    roid.v = (np.random.random(2) - 0.5)*0.01
+    roid.v = (np.random.random(2) - 0.5)*0.03
     roid.register(universe.brane)
 
 

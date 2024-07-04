@@ -13,10 +13,11 @@ def rotMat(theta):
                       [-np.sin(theta),  np.cos(theta)]]))
 
 
-# cached periodic expansion array. Created only once.
-shift_arr = np.array([[-1,-1],[-1,0],[-1,1],
-                      [0,-1], [0,0], [0,1],
-                      [1,-1], [1,0], [1,1]])
+# Cached periodic expansion array. Created only once.
+# Ordered by cells most likely to contain collisions first
+shift_arr = np.array([[0,0], # most likely because everything is warped into it
+                      [0,-1], [0,1], [-1,0], [1,0], 
+                      [-1,-1],[-1,1],[1,-1], [1,1]])
     
 def expandPeriodicImages(r, uniSize):
     """

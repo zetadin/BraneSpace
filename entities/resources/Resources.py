@@ -8,10 +8,11 @@ Created on Thu May 16 15:02:29 2024
 
 import numpy as np
 import numpy.typing as npt
-import pygame
+import GlobalRules
 from entities.Entity import SpriteEntity
 from Universe import updatables, drawables, collectables
 from utils.AssetFactory import assetFactory
+from utils.Geometry import expandPeriodicImages
 
 class Collectable(SpriteEntity):
     """
@@ -41,24 +42,38 @@ class Collectable(SpriteEntity):
             # stationary circle by changing velocity of Collectable
             vdt = self.dr - player.dr            # start to end
             x   = self.r - vdt                   # start pos
-            cx  = player.collector_r - x         # start to center
-            ce  = player.collector_r - self.r    # end to center
             
-            # end points in radius
-            if(np.dot(cx,cx)<=player.collect_radius_sq):
-                sucess = True
-            elif(np.dot(ce,ce)<=player.collect_radius_sq):
-                sucess = True
-            # projection in segment?
+            # with PBC, check agains each image of collector
+            # this is sufficient only if vdt < 0.5 * GlobalRules.curUniverseSize
+            if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+                other_rs = expandPeriodicImages(player.collector_r,
+                                                GlobalRules.curUniverseSize)
             else:
-                vdtsq = np.dot(vdt,vdt)
-                u = np.dot(cx, vdt)/vdtsq
-                if(u>=0.0 and u<=1.0):
-                    # check distance to center
-                    psq = u*u*vdtsq # (pos on start-end segment)^2
-                    dsq = np.dot(cx, cx) - psq # closest distance to center ^2
-                    if(dsq<=player.collect_radius_sq):
-                        sucess = True
+                other_rs = [player.collector_r]
+                
+            # loop through images. Stop when one collision found
+            for otr in other_rs:
+                cx  = otr - x         # start to center
+                ce  = otr - self.r    # end to center
+            
+                # end points in radius
+                if(np.dot(cx,cx)<=player.collect_radius_sq):
+                    sucess = True
+                    break
+                elif(np.dot(ce,ce)<=player.collect_radius_sq):
+                    sucess = True
+                    break
+                # projection in segment?
+                else:
+                    vdtsq = np.dot(vdt,vdt)
+                    u = np.dot(cx, vdt)/vdtsq
+                    if(u>=0.0 and u<=1.0):
+                        # check distance to center
+                        psq = u*u*vdtsq # (pos on start-end segment)^2
+                        dsq = np.dot(cx, cx) - psq # closest distance to center ^2
+                        if(dsq<=player.collect_radius_sq):
+                            sucess = True
+                            break
         
             if(sucess):
                 # give to the player
