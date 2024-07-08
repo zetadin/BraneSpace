@@ -43,9 +43,10 @@ pause_surf = pause_font.render("Press <RETURN> to Play",
 assetFactory.preloadAll()
 
 # init objects in universe
-player = Player()
+player = Player(r = np.zeros(2), v = np.zeros(2))
 player.register(universe.brane)
 tb.bindPlayer(player)
+view.setFocus(player)
 
 selfdot = lambda x : np.dot(x,x)
 for i in range(20):
@@ -158,6 +159,8 @@ while True:
                 # and this is not the last scheduled one
                 break
     
+    # update view after focus positionhas been updated
+    view.update(dt)
     
      
     # wipe screen 
