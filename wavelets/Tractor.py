@@ -6,10 +6,12 @@ Created on Wed May 15 10:21:47 2024
 @author: zetadin
 """
 
-from wavelets.Wavelet import Wavelet
 import numpy as np
 import numpy.typing as npt
 import pygame
+import GlobalRules
+from utils.Geometry import expandPeriodicImages
+from wavelets.Wavelet import Wavelet
 
 
 class Tractor(Wavelet, pygame.sprite.Sprite):
@@ -84,8 +86,19 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
     def f(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
         Wavelet intencity at points x.
+        x : array of 2D points in shape (n,2).
         """
-        rprime = x - self.R[np.newaxis,np.newaxis,:]
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # if pbc, distance should be to nearest periodic image
+            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
+            dif = np.abs(pos - self.R)
+            dif_sq = np.einsum("...ij,...ij->...i", dif,dif) # dot only in last axis
+            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
+            # don't know of a numpy way of replacing this loop
+            for i in range(x.shape[-2]):
+                x[...,i,:] = pos[...,i, nearest[i], :]
+            
+        rprime = x - self.R[np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
         
         # Wavelet window, triangular: ___/\___
@@ -93,7 +106,7 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         mask = W>0.
         W = W[mask]
         
-        I = np.zeros((x.shape[0], x.shape[1]))
+        I = np.zeros((x.shape[0]))
         if(np.any(mask)):  # only do this if there is an active point
         
             # distance dependence from source
@@ -115,6 +128,16 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         """
         Gradient of wavelet intencity at point x.
         """
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # if pbc, distance should be to nearest periodic image
+            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
+            dif = np.abs(pos - self.R)
+            dif_sq = np.einsum("...ij,...ij->...i", dif,dif) # dot only in last axis
+            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
+            # don't know of a numpy way of replacing this loop
+            for i in range(x.shape[-2]):
+                x[...,i,:] = pos[...,i, nearest[i], :]
+            
         rprime = x - self.R[np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
                 

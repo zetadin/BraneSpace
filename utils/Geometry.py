@@ -23,4 +23,4 @@ def expandPeriodicImages(r, uniSize):
     """
     Expand coordintes into their periodic images.
     """
-    return(r[np.newaxis,:] + shift_arr*uniSize)
+    return(r[...,np.newaxis,:] + shift_arr*uniSize)

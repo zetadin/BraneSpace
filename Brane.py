@@ -72,7 +72,7 @@ class Brane(pygame.sprite.Sprite):
         self.I = np.zeros(self.simShape)
         for wl in self.wavelets:
             wl.update(dt)
-            self.I += wl.f(self.coords)
+            self.I += wl.f(self.coords.reshape(-1,2)).reshape(self.simShape)
 
 
     def draw(self, view):
@@ -85,14 +85,14 @@ class Brane(pygame.sprite.Sprite):
             self.calculateSimShape()
             self.I = np.zeros(self.simShape)
             for wl in self.wavelets:
-                self.I += wl.f(self.coords)
+                self.I += wl.f(self.coords.reshape(-1,2)).reshape(self.simShape)
         
         if(self.I is None):
             # We may have started paused, so no updates have occured yet
             # Calculate intensity now.
             self.I = np.zeros(self.simShape)
             for wl in self.wavelets:
-                self.I += wl.f(self.coords)
+                self.I += wl.f(self.coords.reshape(-1,2)).reshape(self.simShape)
             
         # re-paint the surface from simulation
         amp_arr = np.floor(np.clip(256*(self.I*4.0+1)/2, 0,255)).astype(np.uint8)
@@ -137,8 +137,13 @@ class Brane(pygame.sprite.Sprite):
         """
         Compute force from wavelets at given world coordinates.
         """
+        # if PBC, wrap position into primary cell
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            x = np.fmod(x, GlobalRules.curUniverseSize)
+            x[x<0] += GlobalRules.curUniverseSize
+        
         # ask all wavelets for their force contributions
         F = np.zeros(x.shape)
         for wl in self.wavelets:
-            F -= wl.gradf(x)
+            F -= wl.gradf(x.reshape(-1,2)).reshape(x.shape)
         return(F)

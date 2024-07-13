@@ -8,6 +8,8 @@ Created on Fri May 10 13:41:03 2024
 
 import numpy as np
 import numpy.typing as npt
+import GlobalRules
+from utils.Geometry import expandPeriodicImages
 
 class Wavelet:
     """
@@ -47,6 +49,16 @@ class Wavelet:
         """
         Wavelet intencity at points x.
         """
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # if pbc, distance should be to nearest periodic image
+            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
+            dif = np.abs(pos - self.R)
+            dif_sq = np.einsum("aij,aij->ai", dif,dif) # dot only in last axis
+            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
+            # don't know of a numpy way of replacing this loop
+            for i in range(x.shape[0]):
+                x[i] = pos[i, nearest[i], :]
+        
         rprime = x - self.R[np.newaxis,np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
         
@@ -64,6 +76,16 @@ class Wavelet:
         """
         Gradient of wavelet intencity at point x.
         """
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            # if pbc, distance should be to nearest periodic image
+            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
+            dif = np.abs(pos - self.R)
+            dif_sq = np.einsum("aij,aij->ai", dif,dif) # dot only in last axis
+            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
+            # don't know of a numpy way of replacing this loop
+            for i in range(x.shape[0]):
+                x[i] = pos[i, nearest[i], :]
+        
         rprime = x - self.R[np.newaxis,:]
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
         mask = np.logical_and(
