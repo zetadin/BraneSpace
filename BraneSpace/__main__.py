@@ -3,6 +3,7 @@
 # nuitka-project: --follow-imports
 # nuitka-project: --standalone
 # nuitka-project: --include-data-dir={MAIN_DIRECTORY}/assets=BraneSpace/assets
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/docs=docs
 # nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/../rocket.ico
 # nuitka-project: --product-name=BraneSpace
 # nuitka-project: --product-version=0.0.1
