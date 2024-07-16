@@ -9,10 +9,10 @@ Created on Fri May 10 14:09:34 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import GlobalRules
+import core.GlobalRules as GlobalRules
 from utils.Geometry import expandPeriodicImages
 from pygame.locals import *
-from GlobalRules import HEIGHT, WIDTH
+from core.GlobalRules import HEIGHT, WIDTH
 import copy
 
 # cached value for optimization

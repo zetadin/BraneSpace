@@ -9,8 +9,8 @@ Created on Fri May 10 13:31:16 2024
 import numpy as np
 import pygame
 
-import GlobalRules
-from Brane import Brane
+import core.GlobalRules as GlobalRules
+from core.Brane import Brane
 from utils.AssetFactory import assetFactory
 
 class Entity():

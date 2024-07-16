@@ -1,3 +1,12 @@
+# Compilation options
+#
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/assets=.
+# nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/rocket.ico
+# nuitka-project: --product-name=BraneSpace
+# nuitka-project: --product-version=0.0.1
+# nuitka-project: --copyright="(c) 2024 Yuriy Khalak"
+# nuitka-project: --enable-plugin=[numpy,pygame,tqdm]
+
 import sys
 import pygame
 from pygame.locals import *
@@ -6,16 +15,15 @@ import numpy as np
 
 
 #import GlobalRules
-from Brane import Brane
+from core.GlobalRules import HEIGHT, WIDTH, FPS
 from UI.View import View
-from GlobalRules import HEIGHT, WIDTH, FPS
 from entities.Entity import SpriteEntity
 from entities.SimpleObjects import Ball
 from entities.resources.Resources import DarkMatter
 from entities.structures.Portal import Portal
 from entities.hazards.Asteroid import Asteroid
 from entities.Player import Player
-from Universe import Universe
+from core.Universe import Universe
 from UI.TopBar import TopBar
 from utils.AssetFactory import assetFactory
 import time
@@ -194,7 +202,7 @@ while True:
         screenWidth, screenHeight = view.displaysurface.get_size()
         msgWidth, msgHeight = game_over_surf.get_size()
         view.displaysurface.blit(game_over_surf,(0.5*(screenWidth-msgWidth),
-                                                 0.5*(screenHeight-msgHeight)))
+                                                 0.25*(screenHeight-msgHeight)))
     # draw pause
     if(universe.paused):
         screenWidth, screenHeight = view.displaysurface.get_size()

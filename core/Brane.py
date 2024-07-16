@@ -9,7 +9,7 @@ Created on Fri May 10 13:37:21 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import GlobalRules
+import core.GlobalRules as GlobalRules
 from utils.Geometry import expandPeriodicImages
 
 

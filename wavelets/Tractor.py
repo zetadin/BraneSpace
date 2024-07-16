@@ -9,7 +9,7 @@ Created on Wed May 15 10:21:47 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import GlobalRules
+import core.GlobalRules as GlobalRules
 from utils.Geometry import expandPeriodicImages
 from wavelets.Wavelet import Wavelet
 import time

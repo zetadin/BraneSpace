@@ -7,8 +7,8 @@ Created on Fri May 10 13:49:55 2024
 """
 
 import pygame
-import GlobalRules
-from Brane import Brane
+import core.GlobalRules as GlobalRules
+from core.Brane import Brane
 
 
 class Universe():

@@ -7,7 +7,7 @@ Created on Fri May 10 15:01:10 2024
 """
 
 import numpy as np
-import GlobalRules
+import core.GlobalRules as GlobalRules
 from entities.Entity import SpriteEntity
 from utils.Geometry import rotMat, expandPeriodicImages
 
