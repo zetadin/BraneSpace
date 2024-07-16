@@ -47,6 +47,7 @@ class Player(MultiPartCollidable):
         self.bck = False
         
         self.tractor = False
+        self.wavegen = False
         
         # collector motion
         self.direction = np.array([np.sin(self.theta), -np.cos(self.theta)])
@@ -97,23 +98,31 @@ class Player(MultiPartCollidable):
         
         
         # every L/(2*v) seconds emit a tractor wavelet
-        if(self.tractor):
+        if(self.wavegen):
             self.tractorElapsed += dt
-            pulseTime = 8.0*0.5/3.2e-2
+            pulseTime = 32.0*0.5/12.8e-2
             if(self.tractorElapsed > pulseTime):
                 self.tractorElapsed -= pulseTime
+                
+                if(self.tractor):
+                    A = 0.1
+                else:
+                    A =-0.1
                 
                 # source of the wave in sim coords
                 # a bit forward of player ship
                 start = (self.r + 20*self.direction)
                 wl = Tractor(source=start, direction=self.direction,
-                             v = 3.2e-2,
-                             L = 8.0,
-                             A = 0.1,
-                             Rmax = 128., # in world coords
+                             v = 12.8e-2,
+                             L = 32.0,
+                             A = A,
+                             Rmax = 180., # in world coords
                              debug=False)
                 wl.alive = self.tractorElapsed
                 wl.register(self.parentBrane)
+                
+#                print("New Tractor: start=",start, "direction:", self.direction,
+#                      "\nplayer @", self.r, "view @", self.parentBrane.view.center)
         
         
         # collector motion

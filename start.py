@@ -102,9 +102,13 @@ while True:
                 player.fwd = True
             elif event.key in [pygame.K_DOWN, pygame.K_s]:
                 player.bck = True
-            # tractor
-            elif event.key == pygame.K_SPACE:
+            elif event.key in [pygame.K_DOWN, pygame.K_s]:
+                player.bck = True
+            # tractor/repulsor
+            elif event.key in [pygame.K_RSHIFT, pygame.K_LSHIFT]:
                 player.tractor = True
+            elif event.key == pygame.K_SPACE:
+                player.wavegen = True
                 
         elif event.type == pygame.KEYUP:
             # rotation
@@ -116,15 +120,17 @@ while True:
                 player.fwd = False
             elif event.key in [pygame.K_DOWN, pygame.K_s]:
                 player.bck = False
-            # tractor
-            elif event.key == pygame.K_SPACE:
+            # tractor/repulsor
+            elif event.key in [pygame.K_RSHIFT, pygame.K_LSHIFT]:
                 player.tractor = False
+            elif event.key == pygame.K_SPACE:
+                player.wavegen = False
                 
             # quit
             elif event.key == pygame.K_ESCAPE:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
-            # quit
+            # pause
             elif event.key == pygame.K_RETURN:
                 universe.paused = not universe.paused
                 
