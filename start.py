@@ -38,6 +38,15 @@ game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
 pause_font = pygame.font.SysFont('liberationserif', 42)
 pause_surf = pause_font.render("Press <RETURN> to Play",
                                    True, (219,188,86))
+help_font = pygame.font.SysFont('liberationserif', 22)
+help_text ="""Don't touch asteroids.
+Make them collide and collect dropped resources.
+
+<WASD> or arrow keys to move
+<SPACE> for repulsor beam
+<SHIFT> + <SPACE> for tractor beam
+<ESC> to quit"""
+
 
 # load assets
 assetFactory.preloadAll()
@@ -192,6 +201,16 @@ while True:
         msgWidth, msgHeight = pause_surf.get_size()
         view.displaysurface.blit(pause_surf,(0.5*(screenWidth-msgWidth),
                                              0.5*(screenHeight-msgHeight)))
+        
+        # show help on pause
+        help_y_start = 0.6*screenHeight
+        ls = help_font.get_linesize()
+        for i,l in enumerate(help_text.splitlines()):
+            help_line_surf = help_font.render(l, True, (219,188,86))
+            msgWidth, msgHeight = help_line_surf.get_size()
+            view.displaysurface.blit(help_line_surf,
+                                     (0.5*(screenWidth-msgWidth),
+                                      help_y_start + i*ls) )
     
     
  
