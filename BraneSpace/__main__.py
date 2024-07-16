@@ -1,11 +1,13 @@
 # Compilation options
 #
-# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/assets=.
-# nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/rocket.ico
+# nuitka-project: --follow-imports
+# nuitka-project: --standalone
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/assets=BraneSpace/assets
+# nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/../rocket.ico
 # nuitka-project: --product-name=BraneSpace
 # nuitka-project: --product-version=0.0.1
 # nuitka-project: --copyright="(c) 2024 Yuriy Khalak"
-# nuitka-project: --enable-plugin=[numpy,pygame,tqdm]
+
 
 import sys
 import pygame
