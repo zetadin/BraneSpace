@@ -48,18 +48,15 @@ class Wavelet:
     def f(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
         Wavelet intencity at points x.
-        """
+        """        
+        rprime = x - self.R       
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
-            # if pbc, distance should be to nearest periodic image
-            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
-            dif = np.abs(pos - self.R)
-            dif_sq = np.einsum("aij,aij->ai", dif,dif) # dot only in last axis
-            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
-            # don't know of a numpy way of replacing this loop
-            for i in range(x.shape[0]):
-                x[i] = pos[i, nearest[i], :]
-        
-        rprime = x - self.R[np.newaxis,np.newaxis,:]
+            # if pbc, distance should be to nearest periodic image           
+            ab = np.abs(rprime)
+            # both conditions ccan't be true at once
+            rprime[ab > np.abs(rprime + GlobalRules.curUniverseSize)] += GlobalRules.curUniverseSize
+            rprime[ab > np.abs(x - self.R - GlobalRules.curUniverseSize)] -= GlobalRules.curUniverseSize
+            
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
         
         mask = np.logical_and(
@@ -76,17 +73,14 @@ class Wavelet:
         """
         Gradient of wavelet intencity at point x.
         """
+        rprime = x - self.R       
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
-            # if pbc, distance should be to nearest periodic image
-            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
-            dif = np.abs(pos - self.R)
-            dif_sq = np.einsum("aij,aij->ai", dif,dif) # dot only in last axis
-            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
-            # don't know of a numpy way of replacing this loop
-            for i in range(x.shape[0]):
-                x[i] = pos[i, nearest[i], :]
-        
-        rprime = x - self.R[np.newaxis,:]
+            # if pbc, distance should be to nearest periodic image           
+            ab = np.abs(rprime)
+            # both conditions ccan't be true at once
+            rprime[ab > np.abs(rprime + GlobalRules.curUniverseSize)] += GlobalRules.curUniverseSize
+            rprime[ab > np.abs(x - self.R - GlobalRules.curUniverseSize)] -= GlobalRules.curUniverseSize
+            
         distMat = np.sqrt(np.sum(rprime*rprime, axis=-1))
         mask = np.logical_and(
                 distMat <= self.v*self.lifetime,

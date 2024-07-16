@@ -12,6 +12,7 @@ import pygame
 import GlobalRules
 from utils.Geometry import expandPeriodicImages
 from wavelets.Wavelet import Wavelet
+import time
 
 
 class Tractor(Wavelet, pygame.sprite.Sprite):
@@ -88,17 +89,14 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
         Wavelet intencity at points x.
         x : array of 2D points in shape (n,2).
         """
+        rprime = x - self.R[np.newaxis,:]        
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
-            # if pbc, distance should be to nearest periodic image
-            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
-            dif = np.abs(pos - self.R)
-            dif_sq = np.einsum("...ij,...ij->...i", dif,dif) # dot only in last axis
-            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
-            # don't know of a numpy way of replacing this loop
-            for i in range(x.shape[-2]):
-                x[...,i,:] = pos[...,i, nearest[i], :]
+            # if pbc, distance should be to nearest periodic image           
+            ab = np.abs(rprime)
+            # both conditions ccan't be true at once
+            rprime[ab > np.abs(rprime + GlobalRules.curUniverseSize)] += GlobalRules.curUniverseSize
+            rprime[ab > np.abs(x - self.R[np.newaxis,:] - GlobalRules.curUniverseSize)] -= GlobalRules.curUniverseSize
             
-        rprime = x - self.R[np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
         
         # Wavelet window, triangular: ___/\___
@@ -121,24 +119,21 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             
             # putting it together:
             I[mask] = W * Id * Ia
-            
+        
         return(I)
     
     def gradf(self, x: npt.ArrayLike) -> npt.ArrayLike:
         """
         Gradient of wavelet intencity at point x.
         """
+        rprime = x - self.R[np.newaxis,:]        
         if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
-            # if pbc, distance should be to nearest periodic image
-            pos = expandPeriodicImages(x, GlobalRules.curUniverseSize)
-            dif = np.abs(pos - self.R)
-            dif_sq = np.einsum("...ij,...ij->...i", dif,dif) # dot only in last axis
-            nearest = np.argmin(dif_sq, axis=-1) # index of nearest image
-            # don't know of a numpy way of replacing this loop
-            for i in range(x.shape[-2]):
-                x[...,i,:] = pos[...,i, nearest[i], :]
+            # if pbc, distance should be to nearest periodic image           
+            ab = np.abs(rprime)
+            # both conditions ccan't be true at once
+            rprime[ab > np.abs(rprime + GlobalRules.curUniverseSize)] += GlobalRules.curUniverseSize
+            rprime[ab > np.abs(x - self.R[np.newaxis,:] - GlobalRules.curUniverseSize)] -= GlobalRules.curUniverseSize
             
-        rprime = x - self.R[np.newaxis,:]
         rprimeLen = np.linalg.norm(rprime, axis=-1)
                 
         # Wavelet window, triangular: ___/\___
@@ -187,6 +182,9 @@ class Tractor(Wavelet, pygame.sprite.Sprite):
             W = W[:,np.newaxis]
 
             G[mask] = (gradId*Ia + Id*gradIa)*W + Id*Ia*gradW
+
+#        end_time = time.time()
+#        print("pre:", pre_time-start_time, "\tloop:", post_time-pre_time, "\tI:", end_time-post_time)
         
         return(G)
     
