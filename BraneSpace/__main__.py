@@ -32,7 +32,7 @@ import time
 
 # create a viewport
 view = View()
-view.debug = True
+view.debug = False
 
 # create a universe. It will in turn create a brane.
 universe = Universe(view, parallel=False, braneSurfScale=4.0)
@@ -192,8 +192,6 @@ while True:
     cur_hazards = [isinstance(c, Asteroid) for c in universe.collidables]
     cur_hazards = np.count_nonzero(cur_hazards)
     if(desired_hazards>cur_hazards):
-        print(f"Need {desired_hazards} hazards, have {cur_hazards}.")
-        #min_dist_sq = player.size*player.size*9
         cus = GlobalRules.curUniverseSize
         min_dist_sq = (0.4*cus)**2
         
