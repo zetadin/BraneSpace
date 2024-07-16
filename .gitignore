@@ -1,5 +1,6 @@
 # Python3 venv
 BraneSpace_venv
+activate_venv
 
 # WSL zone identifiers
 *Zone.Identifier
