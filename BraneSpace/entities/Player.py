@@ -7,12 +7,12 @@ Created on Fri May 10 15:07:40 2024
 """
 
 import numpy as np
-from entities.Collidable import MultiPartCollidable
-from entities.Entity import SpriteEntity
-from wavelets.Tractor import Tractor
-from UI.View import HEIGHT, WIDTH
-from utils.AssetFactory import assetFactory
-from utils.Geometry import rotMat
+from BraneSpace.entities.Collidable import MultiPartCollidable
+from BraneSpace.entities.Entity import SpriteEntity
+from BraneSpace.wavelets.Tractor import Tractor
+from BraneSpace.UI.View import WIDTH
+from BraneSpace.utils.AssetFactory import assetFactory
+from BraneSpace.utils.Geometry import rotMat
 
 
 class Player(MultiPartCollidable):

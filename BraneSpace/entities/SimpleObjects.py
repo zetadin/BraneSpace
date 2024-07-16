@@ -8,7 +8,7 @@ Created on Fri May 10 14:56:15 2024
 
 import pygame
 from pygame.locals import *
-from entities.Entity import SpriteEntity
+from BraneSpace.entities.Entity import SpriteEntity
 
 
 class Ball(SpriteEntity):

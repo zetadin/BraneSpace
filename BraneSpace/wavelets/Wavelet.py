@@ -8,8 +8,8 @@ Created on Fri May 10 13:41:03 2024
 
 import numpy as np
 import numpy.typing as npt
-import GlobalRules
-from utils.Geometry import expandPeriodicImages
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.utils.Geometry import expandPeriodicImages
 
 class Wavelet:
     """

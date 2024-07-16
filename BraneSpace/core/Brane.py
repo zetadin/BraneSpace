@@ -9,8 +9,8 @@ Created on Fri May 10 13:37:21 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import GlobalRules
-from utils.Geometry import expandPeriodicImages
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.utils.Geometry import expandPeriodicImages
 
 
 VV = 32/1000.

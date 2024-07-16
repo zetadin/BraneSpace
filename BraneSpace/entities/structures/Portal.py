@@ -7,10 +7,8 @@ Created on Fri May 10 15:01:10 2024
 """
 
 import numpy as np
-import pygame
-from pygame.locals import *
-from entities.Collidable import Collidable
-from utils.AssetFactory import assetFactory
+from BraneSpace.entities.Collidable import Collidable
+from BraneSpace.utils.AssetFactory import assetFactory
 
 class Portal(Collidable):
     def __init__(self, *args, **kwargs):

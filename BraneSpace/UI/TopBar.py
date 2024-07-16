@@ -10,8 +10,8 @@ import numpy as np
 import numpy.typing as npt
 import pygame
 from pygame.locals import *
-from UI.View import View
-from utils.AssetFactory import assetFactory
+from BraneSpace.UI.View import View
+from BraneSpace.utils.AssetFactory import assetFactory
 
 
 class TopBar(pygame.sprite.Sprite):

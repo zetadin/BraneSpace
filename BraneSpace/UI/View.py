@@ -9,11 +9,10 @@ Created on Fri May 10 14:09:34 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import GlobalRules
-from utils.Geometry import expandPeriodicImages
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.utils.Geometry import expandPeriodicImages
+from BraneSpace.core.GlobalRules import HEIGHT, WIDTH
 from pygame.locals import *
-from GlobalRules import HEIGHT, WIDTH
-import copy
 
 # cached value for optimization
 SQRT2 = np.sqrt(2)

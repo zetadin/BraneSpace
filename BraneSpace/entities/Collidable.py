@@ -7,9 +7,9 @@ Created on Fri May 10 15:01:10 2024
 """
 
 import numpy as np
-import GlobalRules
-from entities.Entity import SpriteEntity
-from utils.Geometry import rotMat, expandPeriodicImages
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.entities.Entity import SpriteEntity
+from BraneSpace.utils.Geometry import rotMat, expandPeriodicImages
 
 class Collidable(SpriteEntity):
     """

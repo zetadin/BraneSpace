@@ -1,3 +1,15 @@
+# Compilation options
+#
+# nuitka-project: --follow-imports
+# nuitka-project: --standalone
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/assets=BraneSpace/assets
+# nuitka-project: --include-data-dir={MAIN_DIRECTORY}/docs=docs
+# nuitka-project: --windows-icon-from-ico={MAIN_DIRECTORY}/../rocket.ico
+# nuitka-project: --product-name=BraneSpace
+# nuitka-project: --product-version=0.0.1
+# nuitka-project: --copyright="(c) 2024 Yuriy Khalak"
+
+
 import sys
 import pygame
 from pygame.locals import *
@@ -5,24 +17,23 @@ from pygame.locals import *
 import numpy as np
 
 
-#import GlobalRules
-from Brane import Brane
-from UI.View import View
-from GlobalRules import HEIGHT, WIDTH, FPS
-from entities.Entity import SpriteEntity
-from entities.SimpleObjects import Ball
-from entities.resources.Resources import DarkMatter
-from entities.structures.Portal import Portal
-from entities.hazards.Asteroid import Asteroid
-from entities.Player import Player
-from Universe import Universe
-from UI.TopBar import TopBar
-from utils.AssetFactory import assetFactory
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.core.GlobalRules import HEIGHT, WIDTH, FPS
+from BraneSpace.UI.View import View
+from BraneSpace.entities.Entity import SpriteEntity
+from BraneSpace.entities.SimpleObjects import Ball
+from BraneSpace.entities.resources.Resources import DarkMatter
+from BraneSpace.entities.structures.Portal import Portal
+from BraneSpace.entities.hazards.Asteroid import Asteroid
+from BraneSpace.entities.Player import Player
+from BraneSpace.core.Universe import Universe
+from BraneSpace.UI.TopBar import TopBar
+from BraneSpace.utils.AssetFactory import assetFactory
 import time
 
 # create a viewport
 view = View()
-view.debug = True
+view.debug = False
 
 # create a universe. It will in turn create a brane.
 universe = Universe(view, parallel=False, braneSurfScale=4.0)
@@ -66,7 +77,7 @@ for i in range(20):
     loot.v = (np.random.random(2) - 0.5)*0.05
     loot.register(universe.brane)
     
-for i in range(20):
+for i in range(10):
     roid = Asteroid()
     roid.r = np.random.random(2)*WIDTH
     while(selfdot(roid.r-player.r) < player.size*player.size*2):
@@ -174,9 +185,45 @@ while True:
                 # and this is not the last scheduled one
                 break
     
-    # update view after focus positionhas been updated
+    # update view after focus position has been updated
     view.update(dt)
     
+    # do we need more hazards?
+    desired_hazards = 15 + np.floor(1.5*np.sqrt(player.score))
+    cur_hazards = [isinstance(c, Asteroid) for c in universe.collidables]
+    cur_hazards = np.count_nonzero(cur_hazards)
+    if(desired_hazards>cur_hazards):
+        cus = GlobalRules.curUniverseSize
+        min_dist_sq = (0.4*cus)**2
+        
+        # spawn more hazards if too few
+        while desired_hazards>cur_hazards:
+            roid = Asteroid()
+            roid.grow = True
+            roid.size = 0.
+            roid.collisionRadius=0.
+            if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+                roid.r = np.random.random(2)*cus
+                dif = roid.r-player.r
+                # PBC wrap the difference
+                dif = roid.r-player.r
+                ab = np.abs(dif)
+                dif[ab > np.abs(dif + cus)] += cus
+                dif[ab > np.abs(roid.r-player.r - cus)] -= cus
+                while(selfdot(dif) < min_dist_sq):
+                    roid.r = np.random.random(2)*cus
+                    dif = roid.r-player.r
+                    ab = np.abs(dif)
+                    dif[ab > np.abs(dif + cus)] += cus
+                    dif[ab > np.abs(roid.r-player.r - cus)] -= cus
+            else:
+                raise(Exception("Asteroid spawning without PBC is unimplemented."))
+                roid.r = np.random.random(2)*WIDTH
+                while(selfdot(roid.r-player.r) < min_dist_sq):
+                    roid.r = np.random.random(2)*WIDTH
+            roid.v = (np.random.random(2) - 0.5)*0.06
+            roid.register(universe.brane)
+            cur_hazards += 1
      
     # wipe screen 
     view.displaysurface.fill((0,0,0))
@@ -194,7 +241,7 @@ while True:
         screenWidth, screenHeight = view.displaysurface.get_size()
         msgWidth, msgHeight = game_over_surf.get_size()
         view.displaysurface.blit(game_over_surf,(0.5*(screenWidth-msgWidth),
-                                                 0.5*(screenHeight-msgHeight)))
+                                                 0.25*(screenHeight-msgHeight)))
     # draw pause
     if(universe.paused):
         screenWidth, screenHeight = view.displaysurface.get_size()

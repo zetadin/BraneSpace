@@ -7,11 +7,9 @@ Created on Mon Jul  1 14:23:17 2024
 """
 
 import numpy as np
-import pygame
-from pygame.locals import *
-from entities.Collidable import Collidable
-from entities.resources.Resources import DarkMatter
-from utils.AssetFactory import assetFactory
+from BraneSpace.entities.Collidable import Collidable
+from BraneSpace.entities.resources.Resources import DarkMatter
+from BraneSpace.utils.AssetFactory import assetFactory
 
 
 class Explosion(Collidable):
