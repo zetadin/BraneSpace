@@ -8,10 +8,11 @@ Created on Thu May 16 15:02:29 2024
 
 import numpy as np
 import numpy.typing as npt
-import core.GlobalRules as GlobalRules
-from entities.Entity import SpriteEntity
-from utils.AssetFactory import assetFactory
-from utils.Geometry import expandPeriodicImages
+
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.entities.Entity import SpriteEntity
+from BraneSpace.utils.AssetFactory import assetFactory
+from BraneSpace.utils.Geometry import expandPeriodicImages
 
 class Collectable(SpriteEntity):
     """

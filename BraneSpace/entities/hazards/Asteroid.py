@@ -7,12 +7,10 @@ Created on Fri May 10 15:01:10 2024
 """
 
 import numpy as np
-import pygame
-from pygame.locals import *
-from entities.Collidable import Collidable
-from entities.resources.Resources import DarkMatter
-from utils.AssetFactory import assetFactory
-from entities.hazards.Explosion import Explosion
+from BraneSpace.entities.Collidable import Collidable
+from BraneSpace.entities.resources.Resources import DarkMatter
+from BraneSpace.utils.AssetFactory import assetFactory
+from BraneSpace.entities.hazards.Explosion import Explosion
 
 
 class Asteroid(Collidable):

@@ -9,10 +9,9 @@ Created on Wed May 15 10:21:47 2024
 import numpy as np
 import numpy.typing as npt
 import pygame
-import core.GlobalRules as GlobalRules
-from utils.Geometry import expandPeriodicImages
-from wavelets.Wavelet import Wavelet
-import time
+import BraneSpace.core.GlobalRules as GlobalRules
+from BraneSpace.utils.Geometry import expandPeriodicImages
+from BraneSpace.wavelets.Wavelet import Wavelet
 
 
 class Tractor(Wavelet, pygame.sprite.Sprite):

@@ -9,11 +9,14 @@ import glob
 import os
 import pygame
 import tqdm
+import BraneSpace
 
 class AssetFactory():
      def __init__(self):
          self.preloaded_imgs={}
-         self.assets_path = os.path.join(os.getcwd(),"assets")
+         #self.assets_path = os.path.join(os.getcwd(),"assets")
+         self.assets_path = os.path.join(os.path.dirname(BraneSpace.__file__),"assets")
+         
          
      def preloadAll(self):
          """

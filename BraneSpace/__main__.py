@@ -15,17 +15,17 @@ import numpy as np
 
 
 #import GlobalRules
-from core.GlobalRules import HEIGHT, WIDTH, FPS
-from UI.View import View
-from entities.Entity import SpriteEntity
-from entities.SimpleObjects import Ball
-from entities.resources.Resources import DarkMatter
-from entities.structures.Portal import Portal
-from entities.hazards.Asteroid import Asteroid
-from entities.Player import Player
-from core.Universe import Universe
-from UI.TopBar import TopBar
-from utils.AssetFactory import assetFactory
+from BraneSpace.core.GlobalRules import HEIGHT, WIDTH, FPS
+from BraneSpace.UI.View import View
+from BraneSpace.entities.Entity import SpriteEntity
+from BraneSpace.entities.SimpleObjects import Ball
+from BraneSpace.entities.resources.Resources import DarkMatter
+from BraneSpace.entities.structures.Portal import Portal
+from BraneSpace.entities.hazards.Asteroid import Asteroid
+from BraneSpace.entities.Player import Player
+from BraneSpace.core.Universe import Universe
+from BraneSpace.UI.TopBar import TopBar
+from BraneSpace.utils.AssetFactory import assetFactory
 import time
 
 # create a viewport
