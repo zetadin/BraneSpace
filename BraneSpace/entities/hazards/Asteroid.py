@@ -29,6 +29,11 @@ class Asteroid(Collidable):
         self.rot_vel = np.random.uniform(-0.5, 0.5)*np.pi/1000 # +-90 deg/s
         self.theta = np.random.uniform(-1, 1)*np.pi
         
+        # growing
+        self.grow = False
+        self.maxGrowTime = 2000.
+        self.curGrowTime = 0.
+        
 
     def collidedWith(self, other):
         """Handle collisions.
@@ -51,4 +56,18 @@ class Asteroid(Collidable):
         self.alive = False # don't collision detect agains this anymore
         self.parentBrane.parentUniverse.destroy_these_collidables.append(self)
 
+    def update(self, dt: float):
+        super().update(dt)
         
+        # lifetime
+        if(self.grow):
+            self.curGrowTime += dt
+            if(self.curGrowTime > self.maxGrowTime):
+                # stop growing
+                self.grow = False
+            else:
+                # update size
+                factor = self.curGrowTime/self.maxGrowTime
+                self.size = 32*factor
+                self.collisionRadius = 0.5*self.size
+                
