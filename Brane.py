@@ -53,20 +53,27 @@ class Brane(pygame.sprite.Sprite):
         # also compute the coordinate grid in world coords
         grid_x = np.arange(self.simShape[0])*self.surfScale
         grid_y = np.arange(self.simShape[1])*self.surfScale
-        
-        self.coords = np.zeros((self.simShape[0], self.simShape[1], 2))
-        self.coords[:,:,0] = np.repeat(grid_x[:,np.newaxis],
+               
+        self.base_coords = np.zeros((self.simShape[0], self.simShape[1], 2))
+        self.base_coords[:,:,0] = np.repeat(grid_x[:,np.newaxis],
                                        self.simShape[0], axis=1)
-        self.coords[:,:,1] = np.repeat(grid_y[np.newaxis,:],
+        self.base_coords[:,:,1] = np.repeat(grid_y[np.newaxis,:],
                                        self.simShape[1], axis=0)
-        
+        self.coords = self.base_coords
         
     def update(self, dt: float):
         """
         Calculate sum of all wavelet intensities in the simulated region.
         """
         # move coords so they are centered on screen
-        #TODO
+        center_in_coords = self.simShape*self.surfScale*0.5
+        offset = self.view.center - center_in_coords
+        self.coords = self.base_coords + offset
+        
+        # warp coords into primary box image
+        if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
+            self.coords = np.fmod(self.coords, GlobalRules.curUniverseSize)
+            self.coords[self.coords<0] += GlobalRules.curUniverseSize
         
         # update the intensity
         self.I = np.zeros(self.simShape)
@@ -93,6 +100,17 @@ class Brane(pygame.sprite.Sprite):
             self.I = np.zeros(self.simShape)
             for wl in self.wavelets:
                 self.I += wl.f(self.coords.reshape(-1,2)).reshape(self.simShape)
+                
+#        # debug surf size
+#        self.I = np.zeros(self.simShape)
+#        self.I[np.floor(self.simShape[0]*1/4).astype(int) : np.floor(self.simShape[0]*3/4).astype(int),
+#               np.floor(self.simShape[1]*1/4).astype(int) : np.floor(self.simShape[1]*3/4).astype(int)] = 0.05
+#               
+#        self.I[0:4,:] = 1
+#        self.I[-5:-1,:] = 1
+#        self.I[:,0:4] = 1
+#        self.I[:,-5:-1] = 1
+        
             
         # re-paint the surface from simulation
         amp_arr = np.floor(np.clip(256*(self.I*4.0+1)/2, 0,255)).astype(np.uint8)
