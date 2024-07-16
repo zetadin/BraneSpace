@@ -4,4 +4,4 @@ pybind11==2.11.1
 pytest==8.2.0
 tqdm==4.66.4
 nuitka==2.3.11
-patchelf==0.17.2.1
+patchelf==0.17.2.1; sys_platform == 'linux'
