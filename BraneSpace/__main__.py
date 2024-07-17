@@ -69,7 +69,7 @@ tb.bindPlayer(player)
 view.setFocus(player)
 
 selfdot = lambda x : np.dot(x,x)
-for i in range(20):
+for i in range(3):
     loot = DarkMatter()
     loot.r = np.random.random(2)*WIDTH
     while(selfdot(loot.r-player.r) < player.size*player.size):
@@ -188,6 +188,10 @@ while True:
     # update view after focus position has been updated
     view.update(dt)
     
+    # show bounding primitives if game over
+    if(universe.game_over):
+        view.debug = True
+    
     # do we need more hazards?
     desired_hazards = 15 + np.floor(1.5*np.sqrt(player.score))
     cur_hazards = [isinstance(c, Asteroid) for c in universe.collidables]
@@ -204,7 +208,6 @@ while True:
             roid.collisionRadius=0.
             if(GlobalRules.pbc == GlobalRules.PBC.TOROIDAL):
                 roid.r = np.random.random(2)*cus
-                dif = roid.r-player.r
                 # PBC wrap the difference
                 dif = roid.r-player.r
                 ab = np.abs(dif)

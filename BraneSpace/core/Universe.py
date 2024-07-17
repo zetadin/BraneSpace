@@ -39,6 +39,7 @@ class Universe():
         """
         self.game_over = False
         self.paused = True
+        self.view.debug = False
         
         self.drawables.empty()
         self.updatables.clear()
