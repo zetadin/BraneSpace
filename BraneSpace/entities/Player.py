@@ -56,9 +56,9 @@ class Player(MultiPartCollidable):
         
         # collidable parts
         self.part_rel_positions = np.array([
-                [0,-22],[0, 0], [-10,20],[10,20]
+                [0,-22],[0, 0], [-9,18],[9,18]
                 ]) # x,y pairs
-        self.part_radii = [10, 15, 12, 12]
+        self.part_radii = [10, 15, 10, 10]
         
         # attachments: things to draw and update besides the main sprite
         self.engine_flame = SpriteEntity("entities/player/rocket_thrust.png",

@@ -20,7 +20,7 @@ class Asteroid(Collidable):
         # create/load image
         self.img = assetFactory.loadImg("entities/hazards/rock.png", True)
         self.size = 32 # px
-        self.collisionRadius = 0.5*self.size
+        self.collisionRadius = 0.45*self.size
         
         # physics properties
         self.mass = 1.0e4
@@ -69,5 +69,5 @@ class Asteroid(Collidable):
                 # update size
                 factor = self.curGrowTime/self.maxGrowTime
                 self.size = 32*factor
-                self.collisionRadius = 0.5*self.size
+                self.collisionRadius = 0.45*self.size
                 
