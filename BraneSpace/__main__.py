@@ -59,7 +59,7 @@ def reset(_uni, _tb, _view):
         loot.register(universe.brane)
         
     # asteroids:
-    for i in range(10):
+    for i in range(15):
         roid = Asteroid()
         roid.r = np.random.random(2)*WIDTH
         while(selfdot(roid.r-player.r) < player.size*player.size*2):
@@ -171,8 +171,8 @@ while True:
                 universe.paused = not universe.paused
                 # resets if Game Over
                 if(universe.game_over):
-                    universe.reset()
-                    print(player)
+                    player = reset(universe, tb, view)
+                    universe.paused = False
                 
                 
         elif event.type == pygame.VIDEORESIZE:
