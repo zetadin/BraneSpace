@@ -29,10 +29,9 @@ from BraneSpace.entities.Player import Player
 from BraneSpace.core.Universe import Universe
 from BraneSpace.UI.TopBar import TopBar
 from BraneSpace.utils.AssetFactory import assetFactory
+from BraneSpace.utils.Geometry import selfdot
 import time
 
-# helper function for computing distance squared
-selfdot = lambda x : np.dot(x,x)
 
 
 def reset(_uni, _tb, _view):
