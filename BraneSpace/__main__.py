@@ -12,7 +12,7 @@
 
 import sys
 import pygame
-from pygame.locals import *
+#from pygame.locals import *
 
 import numpy as np
 
@@ -47,6 +47,7 @@ def reset(_uni, _tb, _view):
     player.register(_uni.brane)
     _tb.bindPlayer(player)
     _view.setFocus(player)
+    _view.center = player.r # make transition to new player instant
     
     # create some starting objects
     # resources:
@@ -73,6 +74,42 @@ def reset(_uni, _tb, _view):
     #portal.register(universe.brane)
     
     return(player)
+    
+    
+def multilineText2Surf(text, fnt, color=(219,188,86), centered=True):
+    """
+    Blits text line by line to a new surface.
+    Returns the surface.
+    """
+    ls = fnt.get_linesize()
+    line_surfs = []
+    maxWidth = 0
+    totHeight = 0
+    
+    # render individual lines
+    for i,l in enumerate(text.splitlines()):
+        line_surfs.append(fnt.render(l, True, color))
+        msgWidth, msgHeight = line_surfs[-1].get_size()
+        totHeight += ls
+        if(msgWidth>maxWidth):
+            maxWidth = msgWidth
+            
+    # create a transparent output surface
+    surf = pygame.Surface((maxWidth,totHeight), flags=pygame.SRCALPHA)
+    
+    # render lines onto it
+    for i,l in enumerate(line_surfs):    
+        if(centered):
+            # centered
+            msgWidth, msgHeight = l.get_size()
+            surf.blit(l, (0.5*(maxWidth-msgWidth), i*ls) )
+        else:
+            # left justified
+            surf.blit(l, (0, i*ls) )
+        
+    return(surf)
+            
+    
 
 
 # create a viewport
@@ -86,8 +123,12 @@ universe = Universe(view, parallel=False, braneSurfScale=4.0)
 tb = TopBar(view)
 
 # init game_over msg
-game_over_font = pygame.font.SysFont('liberationserif', 64)
-game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
+game_over_font = pygame.font.SysFont('liberationserif', 52)
+#game_over_surf = game_over_font.render("Game Over", True, (219,188,86))
+game_over_surf = multilineText2Surf("Game Over\n\n\nPress <RETURN>\nto Play Again",
+                                    game_over_font,
+                                    color=(219,188,86),
+                                    centered=True)
 
 # init paused msg
 pause_font = pygame.font.SysFont('liberationserif', 42)
@@ -101,6 +142,8 @@ Make them collide and collect dropped resources.
 <SPACE> for repulsor beam
 <SHIFT> + <SPACE> for tractor beam
 <ESC> to quit"""
+help_surf = multilineText2Surf(help_text, help_font,
+                               color=(219,188,86), centered=True)
 
 
 # load assets
@@ -265,7 +308,7 @@ while True:
         screenWidth, screenHeight = view.displaysurface.get_size()
         msgWidth, msgHeight = game_over_surf.get_size()
         view.displaysurface.blit(game_over_surf,(0.5*(screenWidth-msgWidth),
-                                                 0.25*(screenHeight-msgHeight)))
+                                                 0.5*(screenHeight-msgHeight)))
     # draw pause
     if(universe.paused):
         screenWidth, screenHeight = view.displaysurface.get_size()
@@ -275,13 +318,10 @@ while True:
         
         # show help on pause
         help_y_start = 0.6*screenHeight
-        ls = help_font.get_linesize()
-        for i,l in enumerate(help_text.splitlines()):
-            help_line_surf = help_font.render(l, True, (219,188,86))
-            msgWidth, msgHeight = help_line_surf.get_size()
-            view.displaysurface.blit(help_line_surf,
-                                     (0.5*(screenWidth-msgWidth),
-                                      help_y_start + i*ls) )
+        msgWidth, msgHeight = help_surf.get_size()
+        view.displaysurface.blit(help_surf,
+                                 (0.5*(screenWidth-msgWidth),
+                                  help_y_start) )
     
     
  
