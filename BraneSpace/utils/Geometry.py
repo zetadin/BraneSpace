@@ -24,3 +24,6 @@ def expandPeriodicImages(r, uniSize):
     Expand coordintes into their periodic images.
     """
     return(r[...,np.newaxis,:] + shift_arr*uniSize)
+    
+# helper function for computing distance squared
+selfdot = lambda x : np.dot(x,x)
