@@ -31,6 +31,51 @@ from BraneSpace.UI.TopBar import TopBar
 from BraneSpace.utils.AssetFactory import assetFactory
 import time
 
+# helper function for computing distance squared
+selfdot = lambda x : np.dot(x,x)
+
+
+def reset(_uni, _tb, _view):
+    """
+    Resets the game state to starting conditions.
+    Returns a new player instance.
+    """
+    # purge old entities
+    _uni.reset()
+    
+    # create and resister a new Player
+    player = Player(r = np.zeros(2), v = np.zeros(2))
+    player.register(_uni.brane)
+    _tb.bindPlayer(player)
+    _view.setFocus(player)
+    
+    # create some starting objects
+    # resources:
+    for i in range(3):
+        loot = DarkMatter()
+        loot.r = np.random.random(2)*WIDTH
+        while(selfdot(loot.r-player.r) < player.size*player.size):
+            loot.r = np.random.random(2)*WIDTH
+        loot.v = (np.random.random(2) - 0.5)*0.05
+        loot.register(universe.brane)
+        
+    # asteroids:
+    for i in range(10):
+        roid = Asteroid()
+        roid.r = np.random.random(2)*WIDTH
+        while(selfdot(roid.r-player.r) < player.size*player.size*2):
+            roid.r = np.random.random(2)*WIDTH
+        roid.v = (np.random.random(2) - 0.5)*0.03
+        roid.register(universe.brane)
+        
+    # staructures:
+    #portal = Portal()
+    #portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
+    #portal.register(universe.brane)
+    
+    return(player)
+
+
 # create a viewport
 view = View()
 view.debug = False
@@ -62,34 +107,8 @@ Make them collide and collect dropped resources.
 # load assets
 assetFactory.preloadAll()
 
-# init objects in universe
-player = Player(r = np.zeros(2), v = np.zeros(2))
-player.register(universe.brane)
-tb.bindPlayer(player)
-view.setFocus(player)
-
-selfdot = lambda x : np.dot(x,x)
-for i in range(3):
-    loot = DarkMatter()
-    loot.r = np.random.random(2)*WIDTH
-    while(selfdot(loot.r-player.r) < player.size*player.size):
-        loot.r = np.random.random(2)*WIDTH
-    loot.v = (np.random.random(2) - 0.5)*0.05
-    loot.register(universe.brane)
-    
-for i in range(10):
-    roid = Asteroid()
-    roid.r = np.random.random(2)*WIDTH
-    while(selfdot(roid.r-player.r) < player.size*player.size*2):
-        roid.r = np.random.random(2)*WIDTH
-    roid.v = (np.random.random(2) - 0.5)*0.03
-    roid.register(universe.brane)
-
-
-
-#portal = Portal()
-#portal.r = np.array([WIDTH*0.7, WIDTH*0.7])
-#portal.register(universe.brane)
+# init game state
+player = reset(universe, tb, view);
 
 
 # initial guess at frame time
@@ -98,8 +117,6 @@ dt = 1000./FPS
 updatesPerFrame = 1     # start with 1
 maxUpdatesPerFrame = 1  # increase to this many if fast enough
 update_dt = dt/updatesPerFrame
-
-
 
 
 # game loop
@@ -150,9 +167,14 @@ while True:
             elif event.key == pygame.K_ESCAPE:
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
-            # pause
+            # pause/resume
             elif event.key == pygame.K_RETURN:
                 universe.paused = not universe.paused
+                # resets if Game Over
+                if(universe.game_over):
+                    universe.reset()
+                    print(player)
+                
                 
         elif event.type == pygame.VIDEORESIZE:
             # window changed size
