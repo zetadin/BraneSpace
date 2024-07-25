@@ -143,4 +143,5 @@ class SpriteEntity(Entity, pygame.sprite.Sprite):
     def register(self, brane: Brane):
         """Add to the list of objects in the universe."""
         super().register(brane)
-        self.parentBrane.parentUniverse.drawables.add(self)        
+        #self.parentBrane.parentUniverse.drawables.add(self)
+        self.parentBrane.parentUniverse.drawables.append(self)

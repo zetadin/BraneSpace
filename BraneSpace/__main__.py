@@ -33,7 +33,6 @@ from BraneSpace.utils.Geometry import selfdot
 import time
 
 
-
 def reset(_uni, _tb, _view):
     """
     Resets the game state to starting conditions.
@@ -50,14 +49,14 @@ def reset(_uni, _tb, _view):
     _view.center = player.r # make transition to new player instant
     
     # create some starting objects
-    # resources:
-    for i in range(3):
-        loot = DarkMatter()
-        loot.r = np.random.random(2)*WIDTH
-        while(selfdot(loot.r-player.r) < player.size*player.size):
-            loot.r = np.random.random(2)*WIDTH
-        loot.v = (np.random.random(2) - 0.5)*0.05
-        loot.register(universe.brane)
+#    # resources:
+#    for i in range(10):
+#        loot = DarkMatter()
+#        loot.r = np.random.random(2)*WIDTH
+#        while(selfdot(loot.r-player.r) < player.size*player.size):
+#            loot.r = np.random.random(2)*WIDTH
+#        #loot.v = (np.random.random(2) - 0.5)*0.05
+#        loot.register(universe.brane)
         
     # asteroids:
     for i in range(15):

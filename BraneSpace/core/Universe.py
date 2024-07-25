@@ -20,10 +20,16 @@ class Universe():
         self.parallel = parallel
         self.view = view
         
-        self.drawables = pygame.sprite.Group()
-        self.updatables=[]
-        self.collectables=[]
-        self.collidables=[]
+        # Sprite Groups have a lot of overhead and seem to be designed for
+        # situations where you redraw only parts of the screen.
+        # Here we redraw everything every frame becasue of the motion.
+        # It's more efficient to use simple lists.
+        
+        #self.drawables = pygame.sprite.Group()
+        self.drawables = []
+        self.updatables = []
+        self.collectables = []
+        self.collidables = []
         
         self.reset()
         
@@ -41,7 +47,8 @@ class Universe():
         self.paused = True
         self.view.debug = False
         
-        self.drawables.empty()
+        #self.drawables.empty()
+        self.drawables.clear()
         self.updatables.clear()
         self.collectables.clear()
         self.collidables.clear()
@@ -58,7 +65,8 @@ class Universe():
         self.brane = Brane(self.braneSurfScale, self.view)
         self.brane.parentUniverse = self
         # register brane here to avoid a circular import
-        self.drawables.add(self.brane)
+        #self.drawables.add(self.brane)
+        self.drawables.append(self.brane)
         self.updatables.append(self.brane)
         
         
@@ -69,6 +77,22 @@ class Universe():
         """
         for e in self.destroy_these_collidables:
             e.destroy()
+        self.destroy_these_collidables=[]
+        
+        
+    def fastDestroyRequested(self):
+        """
+        Destroy entities after the update step.
+        Instead of removing individual entities creates new lists
+        for the ones to keep. Should be faster.
+        Needs to be after update to avoid iterating through a missing entity.
+        """            
+            
+        self.collidables = [e for e in self.collidables if e not in self.destroy_these_collidables]
+        self.updatables = [e for e in self.updatables if e not in self.destroy_these_collidables]
+        #self.drawables.remove(self.destroy_these_collidables)
+        self.drawables = [e for e in self.drawables if e not in self.destroy_these_collidables]
+        
         self.destroy_these_collidables=[]
         
         
@@ -85,7 +109,7 @@ class Universe():
                             sj.collidedWith(si)
                             break
                     
-        self.destroyRequested()
+        self.fastDestroyRequested()
             
         
             
