@@ -4,7 +4,7 @@ Summary:
 
 The game source is publically available.
 You can use, give away copies, and modify BraneSpace as you see fit.
-The same licence shal applly to any copies or derivative works you make.
+The same license shall apply to any copies or derivative works you make.
 You may distribute gameplay videos, even if they are supported by ads. Other comercial use is prohibited. Eg.:
  You may not sell a copy or a derrivative work of BraneSpace.
 If you are interested in obtaining BraneSpace under a different license, please contact the author.
@@ -13,7 +13,7 @@ If you are interested in obtaining BraneSpace under a different license, please 
 #####################################################
 Details:
 
-BraneSpace is licenced for public use under a CC BY-NC-SA 4.0 (see below) with the following exception:
+BraneSpace is licensed for public use under a CC BY-NC-SA 4.0 (see below) with the following exception:
 
 Public display, demonstration, and streaming of BraneSpace gameplay is explicitly permitted
 even if it would otherwise be considered comercial use under the CC BY-NC-SA 4.0 license.
@@ -23,7 +23,7 @@ These assets can be redistributed under CC BY 3.0 license, even when they were t
 
 BraneSpace uses python 3 (https://docs.python.org/3/license.html), numpy (https://numpy.org/doc/stable/license.html),
 and pygame (LGPL 2.1, https://github.com/pygame/pygame/blob/main/docs/LGPL.txt) which have their own licences.
-Details of these licences can be found in docs/licenses folder.
+Details of these licenses can be found in docs/licenses folder.
 
 #####################################################
 Attribution-NonCommercial-ShareAlike 4.0 International
