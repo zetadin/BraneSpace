@@ -2,6 +2,9 @@
 BraneSpace_venv
 activate_venv
 
+# build folder
+BraneSpace.build
+
 # WSL zone identifiers
 *Zone.Identifier
 
