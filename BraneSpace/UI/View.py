@@ -27,7 +27,8 @@ class View():
         
         # add a window
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT),
-                                                      pygame.locals.RESIZABLE)
+                                                      #pygame.locals.RESIZABLE
+                                                      )
         self.screen_box = np.array([WIDTH, HEIGHT])
         pygame.display.set_caption("BraneSpace")
         
