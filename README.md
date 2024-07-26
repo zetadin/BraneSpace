@@ -19,7 +19,7 @@ python -m BraneSpace
 ## Compiling the executables
 BraneSpace uses [Nuitka](https://nuitka.net/) to build executables of the game that do not require Python to be installed.
 To build them first create a virtual environment with all the dependencies, then run Nuitka.
-For Linux, bash scripts are provided for these functions:
+For Linux, bash scripts are provided for these steps:
 ```
 ./setup_venv.sh
 ./build.sh
