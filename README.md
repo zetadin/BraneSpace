@@ -29,3 +29,6 @@ For Windows the only difference is activating the virtual environment requires a
 ```
 .\BraneSpace_venv\Scripts\activate.bat
 ```
+
+## Example Gameplay
+![Gameplay](https://github.com/zetadin/BraneSpace/blob/main/screen_cap.webp?raw=true)

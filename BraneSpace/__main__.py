@@ -15,6 +15,7 @@ import pygame
 #from pygame.locals import *
 
 import numpy as np
+import imageio, copy
 
 
 import BraneSpace.core.GlobalRules as GlobalRules
@@ -159,6 +160,12 @@ updatesPerFrame = 1     # start with 1
 maxUpdatesPerFrame = 1  # increase to this many if fast enough
 update_dt = dt/updatesPerFrame
 
+# screen capture
+screen_cap = False
+screen_cap_fn_base = "screen_cap"
+screenshot_id = 0
+screenshots=[]
+
 
 # game loop
 while True:
@@ -187,6 +194,14 @@ while True:
                 player.tractor = True
             elif event.key == pygame.K_SPACE:
                 player.wavegen = True
+
+            # toggle screen capture
+            if event.key == pygame.K_F12:
+                screen_cap = not screen_cap
+                if(screen_cap):
+                    screenshots=[]
+                else:
+                    imageio.mimsave('screen_cap.gif', screenshots)
                 
         elif event.type == pygame.KEYUP:
             # rotation
@@ -326,6 +341,13 @@ while True:
  
     # push to frame buffer
     pygame.display.update()
+
+    # record screenshot
+    if(screen_cap):
+        imgdata = copy.deepcopy(pygame.surfarray.array3d(view.displaysurface))
+        imgdata = imgdata.swapaxes(0,1)
+
+        screenshots.append(imgdata)
     
     # wait for next frame
     dt = view.FramePerSec.tick(FPS)

@@ -2,6 +2,9 @@
 BraneSpace_venv
 activate_venv
 
+# screen recordings
+screen_cap*
+
 # build folder
 BraneSpace.build
 
