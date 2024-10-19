@@ -11,7 +11,7 @@ To shorten interstellar trade routes, InterDimTrade Inc. egineers have found a w
 The laws of physics in these branes are different, making the travel dangerous. So InterDimTrade has hired you to find or build safe trade routes through BraneSpace to a number of systems.
 
 ## To use:
-The game is a python module with a __main__.py file that starts it. So to run the gme, run the module:
+The game is a python module with a __main__.py file that starts it. So to run the game, run the module:
 ```
 python -m BraneSpace
 ```
